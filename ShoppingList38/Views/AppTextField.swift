@@ -29,17 +29,17 @@ struct AppTextField: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 16))
-                            .foregroundStyle(AppColors.disabledButtonText)
+                            .foregroundStyle(.disabledButtonText)
                     }
                 }
             }
             .padding(.horizontal, 16)
             .frame(height: 54)
-            .background(AppColors.surfaceBackground)
+            .background(.surfaceBackground)
             .overlay {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(
-                        hasError ? AppColors.deleteAction : Color.clear,
+                        hasError ? .deleteAction : Color.clear,
                         lineWidth: hasError ? 0.5 : 0
                     )
             }
@@ -48,7 +48,7 @@ struct AppTextField: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(AppTypography.footnoteRegular)
-                    .foregroundStyle(AppColors.deleteAction)
+                    .foregroundStyle(.deleteAction)
                     .padding(.horizontal, 8)
             }
         }
@@ -62,7 +62,7 @@ struct AppTextField: View {
         text: .constant("")
     )
     .padding()
-    .background(AppColors.appBackground)
+    .background(.appBackground)
     
 }
 
@@ -73,7 +73,7 @@ struct AppTextField: View {
         text: .constant("Мои продукты")
     )
     .padding()
-    .background(AppColors.appBackground)
+    .background(.appBackground)
 }
 
 #Preview("Error State") {
@@ -83,5 +83,5 @@ struct AppTextField: View {
         text: .constant("Существующее имя")
     )
     .padding()
-    .background(AppColors.appBackground)
+    .background(.appBackground)
 }

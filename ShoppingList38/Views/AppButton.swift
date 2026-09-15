@@ -18,12 +18,12 @@ struct AppButton: View {
             Text(title)
                 .font(AppTypography.headline)
                 .foregroundStyle(
-                    isActive ? AppColors.surfaceBackground : AppColors.disabledButtonText
+                    isActive ? .surfaceBackground : .disabledButtonText
                 )
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(
-                    isActive ? AppColors.primaryAction : AppColors.disabledButton
+                    isActive ? .primaryAction : .disabledButton
                 )
                 .clipShape(Capsule())
         }
