@@ -9,8 +9,16 @@ import SwiftUI
 
 struct ColorSelectorView: View {
 
+    @Environment(\.colorScheme) private var colorScheme
+
     let title: String
     @Binding var selectedColor: ListColor
+
+    private var displayedColors: [ListColor] {
+        colorScheme == .dark
+            ? [.green, .purple, .blue, .red, .yellow]
+            : ListColor.allCases
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -19,7 +27,7 @@ struct ColorSelectorView: View {
                 .foregroundStyle(Color("PrimaryText"))
 
             HStack(spacing: 0) {
-                ForEach(ListColor.allCases) { listColor in
+                ForEach(displayedColors) { listColor in
                     colorButton(for: listColor)
                         .frame(maxWidth: .infinity)
                 }

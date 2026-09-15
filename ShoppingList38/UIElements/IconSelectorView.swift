@@ -9,6 +9,8 @@ import SwiftUI
 
 struct IconSelectorView: View {
 
+    @Environment(\.colorScheme) private var colorScheme
+
     let title: String
     let selectionColor: Color
     @Binding var selectedIcon: ListIcon
@@ -65,7 +67,11 @@ struct IconSelectorView: View {
     }
 
     private func iconColor(for icon: ListIcon) -> Color {
-        selectedIcon == icon ? .black : .white
+        if selectedIcon == icon || colorScheme == .dark {
+            return .black
+        }
+
+        return .white
     }
 }
 
