@@ -14,25 +14,25 @@ struct EmptyStateView: View {
     let imageSize: CGFloat
     
     var body: some View {
-        VStack(spacing: AppLayout.emptyStateVerticalSpacing) {
+        VStack(spacing: 28) {
             
             Image(imageName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: imageSize, height: imageSize)
 
-            VStack(spacing: AppLayout.emptyStateTextSpacing) {
+            VStack(spacing: 4) {
                 
                 Text(title)
                     .font(AppTypography.title3Semibold)
-
+                
                 Text(subtitle)
                     .font(AppTypography.body)
             }
             .multilineTextAlignment(.center)
             .foregroundStyle(.primaryText)
         }
-        .padding(.horizontal, AppLayout.emptyStateHorizontalPadding)
+        .padding(.horizontal, 16)
     }
 }
 
@@ -41,7 +41,7 @@ struct EmptyStateView: View {
         imageName: "EmptyListsImage",
         title: "Давайте спланируем покупки!",
         subtitle: "Создайте свой первый список",
-        imageSize: AppLayout.emptyStateImageSizeLists
+        imageSize: 277
     )
 }
 
@@ -50,6 +50,6 @@ struct EmptyStateView: View {
         imageName: "EmptyProductsImage",
         title: "Давайте спланируем покупки!",
         subtitle: "Начните добавлять товары",
-        imageSize: AppLayout.emptyStateImageSizeItems
+        imageSize: 343
     )
 }
