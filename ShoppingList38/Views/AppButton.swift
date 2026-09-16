@@ -18,10 +18,10 @@ struct AppButton: View {
             Text(title)
                 .font(AppTypography.headline)
                 .foregroundStyle(
-                    isActive ? .surfaceBackground : .disabledButtonText
+                    isActive ? .white : .disabledButtonText
                 )
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .frame(height: 44)
                 .background(
                     isActive ? .primaryAction : .disabledButton
                 )
@@ -31,12 +31,26 @@ struct AppButton: View {
     }
 }
 
-#Preview("Active") {
+#Preview("Light - Active") {
     AppButton(title: "Создать список", isActive: true) {}
         .padding(16)
+        .preferredColorScheme(.light)
 }
 
-#Preview("Disabled") {
+#Preview("Light - Disabled") {
     AppButton(title: "Создать", isActive: false) {}
         .padding(16)
+        .preferredColorScheme(.light)
+}
+
+#Preview("Dark - Active") {
+    AppButton(title: "Создать список", isActive: true) {}
+        .padding(16)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Dark - Disabled") {
+    AppButton(title: "Создать", isActive: false) {}
+        .padding(16)
+        .preferredColorScheme(.dark)
 }
