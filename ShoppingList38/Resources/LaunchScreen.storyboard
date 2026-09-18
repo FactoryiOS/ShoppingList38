@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LaunchScreenImage" translatesAutoresizingMaskIntoConstraints="NO" id="o1J-Dh-vFC">
+                                <rect key="frame" x="36.666666666666657" y="266" width="320" height="320"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="o1J-Dh-vFC" secondAttribute="height" id="Ai0-i3-Ucg"/>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="420" id="f4k-vm-ZqB"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Список покупок" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="awN-kM-yF0">
+                                <rect key="frame" x="69.333333333333329" y="606" width="254.66666666666669" height="42"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="35"/>
+                                <color key="textColor" name="PrimaryAction"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" name="AppBackground"/>
+                        <constraints>
+                            <constraint firstItem="o1J-Dh-vFC" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1qu-MM-1Yi"/>
+                            <constraint firstItem="o1J-Dh-vFC" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="Cwl-9d-h2R"/>
+                            <constraint firstItem="awN-kM-yF0" firstAttribute="top" secondItem="o1J-Dh-vFC" secondAttribute="bottom" constant="20" id="ovO-6K-mhD"/>
+                            <constraint firstItem="awN-kM-yF0" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="tqq-aH-DKZ"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="53" y="375"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="LaunchScreenImage" width="320" height="320"/>
+        <namedColor name="AppBackground">
+            <color red="0.96078431372549022" green="0.96078431372549022" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="PrimaryAction">
+            <color red="0.078431372549019607" green="0.47843137254901963" blue="0.52156862745098043" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>
