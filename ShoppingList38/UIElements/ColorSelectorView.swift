@@ -12,7 +12,7 @@ struct ColorSelectorView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let title: String
-    @Binding var selectedColor: ListColor
+    @Binding var selectedColor: ListColor?
 
     private var displayedColors: [ListColor] {
         colorScheme == .dark
@@ -77,19 +77,23 @@ struct ColorSelectorView: View {
     }
 }
 
+#Preview("Color selector - Nothing selected") {
+    ColorSelectorPreview(selectedColor: nil)
+}
+
 #Preview("Color selector - Light") {
-    ColorSelectorPreview()
+    ColorSelectorPreview(selectedColor: .blue)
         .preferredColorScheme(.light)
 }
 
 #Preview("Color selector - Dark") {
-    ColorSelectorPreview()
+    ColorSelectorPreview(selectedColor: .blue)
         .preferredColorScheme(.dark)
 }
 
 private struct ColorSelectorPreview: View {
 
-    @State private var selectedColor = ListColor.blue
+    @State var selectedColor: ListColor?
 
     var body: some View {
         ColorSelectorView(

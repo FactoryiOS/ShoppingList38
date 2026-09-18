@@ -13,7 +13,7 @@ struct IconSelectorView: View {
 
     let title: String
     let selectionColor: Color
-    @Binding var selectedIcon: ListIcon
+    @Binding var selectedIcon: ListIcon?
 
     private let columns = Array(
         repeating: GridItem(.flexible(), spacing: 8),
@@ -75,19 +75,23 @@ struct IconSelectorView: View {
     }
 }
 
+#Preview("Icon selector - Nothing selected") {
+    IconSelectorPreview(selectedIcon: nil)
+}
+
 #Preview("Icon selector - Light") {
-    IconSelectorPreview()
+    IconSelectorPreview(selectedIcon: .snowflake)
         .preferredColorScheme(.light)
 }
 
 #Preview("Icon selector - Dark") {
-    IconSelectorPreview()
+    IconSelectorPreview(selectedIcon: .snowflake)
         .preferredColorScheme(.dark)
 }
 
 private struct IconSelectorPreview: View {
 
-    @State private var selectedIcon = ListIcon.snowflake
+    @State var selectedIcon: ListIcon?
 
     var body: some View {
         IconSelectorView(
