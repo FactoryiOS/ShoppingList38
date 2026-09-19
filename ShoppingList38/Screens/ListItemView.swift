@@ -17,7 +17,7 @@ struct ListItemView: View {
                 .scaledToFit()
                 .frame(width: 21, height: 21)
                 .frame(width: 48, height: 48)
-                .background(.listColorBlue)
+                .background(item.iconColor)
                 .clipShape(Circle())
 
             Text(item.title)
