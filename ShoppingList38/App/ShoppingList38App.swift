@@ -9,9 +9,19 @@ import SwiftUI
 
 @main
 struct ShoppingList38App: App {
+    @State private var appState = AppState()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if appState.shouldShowWelcome {
+                    MockWelcomeView {
+                        appState.handleWelcomeCompletion()
+                    }
+                } else {
+                    ContentView()
+                }
+            }
         }
     }
 }
