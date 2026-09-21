@@ -12,7 +12,7 @@ struct ShoppingItem: Identifiable, Hashable {
     let title: String
     let quantity: Int
     let unit: String
-    let isPurchased: Bool
+    var isPurchased: Bool
 }
 
 extension ShoppingItem {

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ShoppingItemView: View {
-    let item: ShoppingItem
+    @Binding var item: ShoppingItem
 
     var body: some View {
         HStack(spacing: 12) {
@@ -37,33 +37,39 @@ struct ShoppingItemView: View {
         item.isPurchased ? Color("ListSecondaryText") : Color("PrimaryText")
     }
 
-    @ViewBuilder
     private var checkboxView: some View {
-        Group {
-            if item.isPurchased {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color("PrimaryAction"))
-                        .frame(width: 24, height: 24)
+        Button {
+            item.isPurchased.toggle()
+        } label: {
+            Group {
+                if item.isPurchased {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(Color("PrimaryAction"))
+                            .frame(width: 24, height: 24)
 
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.white)
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
+                } else {
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color("ListSecondaryText"), lineWidth: 1.5)
+                        .frame(width: 24, height: 24)
                 }
-            } else {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(Color("ListSecondaryText"), lineWidth: 1.5)
-                    .frame(width: 24, height: 24)
             }
+            .frame(width: 44, height: 44)
         }
-        .frame(width: 44, height: 44)
-        .allowsHitTesting(false)
+        .buttonStyle(.plain)
     }
 }
 
 #Preview {
+    @Previewable @State var notPurchasedItem = ShoppingItem.mockNotPurchased
+    @Previewable @State var purchasedItem = ShoppingItem.mockPurchased
+
     VStack(spacing: 0) {
-        ShoppingItemView(item: .mockNotPurchased)
-        ShoppingItemView(item: .mockPurchased)
+        ShoppingItemView(item: $notPurchasedItem)
+        ShoppingItemView(item: $purchasedItem)
     }
 }
