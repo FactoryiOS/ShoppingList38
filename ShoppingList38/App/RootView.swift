@@ -2,6 +2,8 @@
 //  RootView.swift
 //  ShoppingList38
 //
+//  Created by Сергей Хмелёв on 21.09.2026.
+//
 
 import SwiftUI
 
