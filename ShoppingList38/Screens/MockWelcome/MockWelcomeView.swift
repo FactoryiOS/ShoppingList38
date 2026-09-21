@@ -2,6 +2,8 @@
 //  MockWelcomeView.swift
 //  ShoppingList38
 //
+//  Created by Сергей Хмелёв on 20.09.2026.
+//
 
 import SwiftUI
 

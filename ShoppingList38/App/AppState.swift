@@ -7,20 +7,25 @@
 
 import Observation
 
+enum AppRoute {
+    case welcome
+    case content
+}
+
 @MainActor
 @Observable
 final class AppState {
     private let preferences: any PreferencesStoring
 
-    private(set) var shouldShowWelcome: Bool
+    private(set) var route: AppRoute
 
-    init(preferences: any PreferencesStoring = PreferencesService()) {
+    init(preferences: any PreferencesStoring) {
         self.preferences = preferences
-        shouldShowWelcome = !preferences.hasCompletedWelcome
+        route = preferences.hasCompletedWelcome ? .content : .welcome
     }
 
     func handleWelcomeCompletion() {
         preferences.hasCompletedWelcome = true
-        shouldShowWelcome = false
+        route = .content
     }
 }
