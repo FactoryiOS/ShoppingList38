@@ -20,7 +20,7 @@ struct ShoppingItemView: View {
 
             Spacer()
 
-            Text("\(item.quantity) шт.")
+            Text("\(item.quantity) \(item.unit)")
                 .font(AppTypography.body)
                 .foregroundStyle(textColor)
         }
@@ -39,21 +39,25 @@ struct ShoppingItemView: View {
 
     @ViewBuilder
     private var checkboxView: some View {
-        if item.isPurchased {
-            ZStack {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color("PrimaryAction"))
-                    .frame(width: 24, height: 24)
+        Group {
+            if item.isPurchased {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color("PrimaryAction"))
+                        .frame(width: 24, height: 24)
 
-                Image(systemName: "checkmark")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(.white)
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+            } else {
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color("ListSecondaryText"), lineWidth: 1.5)
+                    .frame(width: 24, height: 24)
             }
-        } else {
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(Color("ListSecondaryText"), lineWidth: 1.5)
-                .frame(width: 24, height: 24)
         }
+        .frame(width: 44, height: 44)
+        .allowsHitTesting(false)
     }
 }
 
