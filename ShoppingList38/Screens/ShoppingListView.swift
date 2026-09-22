@@ -14,21 +14,21 @@ struct ShoppingListView: View {
         @Bindable var observed = observed
 
         List {
-            ForEach($observed.items) { $item in
-                ShoppingItemView(item: $item)
+            ForEach(observed.filteredItemIndices, id: \.self) { index in
+                ShoppingItemView(item: $observed.items[index])
                     .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color("SurfaceBackground"))
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         Button {
-                            observed.deleteItem(item)
+                            observed.deleteItem(observed.items[index])
                         } label: {
                             Image(systemName: "trash")
                         }
                         .tint(.deleteAction)
 
                         Button {
-                            observed.handleEditItem(item)
+                            observed.handleEditItem(observed.items[index])
                         } label: {
                             Image(systemName: "square.and.pencil")
                         }
@@ -39,6 +39,11 @@ struct ShoppingListView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Color("SurfaceBackground"))
+        .searchable(
+            text: $observed.searchText,
+            placement: .navigationBarDrawer(displayMode: .always),
+            prompt: "Поиск"
+        )
         .safeAreaInset(edge: .bottom) {
             AppButton(
                 title: "Добавить товар",

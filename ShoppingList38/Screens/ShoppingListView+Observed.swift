@@ -12,6 +12,7 @@ extension ShoppingListView {
     final class Observed {
         var listTitle: String
         var items: [ShoppingItem]
+        var searchText = ""
 
         init(
             listTitle: String = "Новый год",
@@ -19,6 +20,13 @@ extension ShoppingListView {
         ) {
             self.listTitle = listTitle
             self.items = items
+        }
+        
+        var filteredItemIndices: [Int] {
+            items.indices.filter { index in
+                searchText.isEmpty ||
+                items[index].title.localizedCaseInsensitiveContains(searchText)
+            }
         }
 
         func deleteItem(_ item: ShoppingItem) {
