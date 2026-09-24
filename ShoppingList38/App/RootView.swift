@@ -13,7 +13,7 @@ struct RootView: View {
     var body: some View {
         switch appState.route {
         case .welcome:
-            MockWelcomeView {
+            WelcomeView {
                 appState.handleWelcomeCompletion()
             }
         case .content:
