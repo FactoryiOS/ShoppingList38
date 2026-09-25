@@ -62,7 +62,7 @@ struct MyListsView: View {
                             } label: {
                                 Image(systemName: "square.and.pencil")
                             }
-                            .tint(.disabledButton)
+                            .tint(.editAction)
                         }
                     
                         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
@@ -93,4 +93,3 @@ struct MyListsView: View {
 #Preview("Data") {
     MyListsView(items: ListItem.mocks)
 }
-
