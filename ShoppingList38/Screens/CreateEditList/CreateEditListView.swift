@@ -36,13 +36,13 @@ struct CreateEditListView: View {
     /// Наблюдаемое состояние и логика формы.
     @State private var observed: Observed
 
-    /// Обработчик, которому передаются данные списка после сохранения.
-    private let onSave: (ListDraft) -> Void
+    /// Обработчик сохранения, возвращающий признак успешного завершения операции.
+    private let onSave: (ListDraft) -> Bool
 
     init(
         mode: Mode,
         existingListNames: [String] = [],
-        onSave: @escaping (ListDraft) -> Void = { _ in }
+        onSave: @escaping (ListDraft) -> Bool
     ) {
         _observed = State(
             initialValue: Observed(
@@ -126,7 +126,10 @@ struct CreateEditListView: View {
             return
         }
 
-        onSave(draft)
+        guard onSave(draft) else {
+            return
+        }
+
         dismiss()
     }
 }
@@ -135,7 +138,8 @@ struct CreateEditListView: View {
     NavigationStack {
         CreateEditListView(
             mode: .create,
-            existingListNames: ["Новый год"]
+            existingListNames: ["Новый год"],
+            onSave: { _ in true }
         )
     }
     .preferredColorScheme(.light)
@@ -145,7 +149,8 @@ struct CreateEditListView: View {
     NavigationStack {
         CreateEditListView(
             mode: .create,
-            existingListNames: ["Новый год"]
+            existingListNames: ["Новый год"],
+            onSave: { _ in true }
         )
     }
     .preferredColorScheme(.dark)
@@ -158,7 +163,8 @@ struct CreateEditListView: View {
                 name: "Новый год",
                 color: .blue,
                 icon: .snowflake
-            )
+            ),
+            onSave: { _ in true }
         )
     }
     .preferredColorScheme(.light)
@@ -171,7 +177,8 @@ struct CreateEditListView: View {
                 name: "Новый год",
                 color: .blue,
                 icon: .snowflake
-            )
+            ),
+            onSave: { _ in true }
         )
     }
     .preferredColorScheme(.dark)
