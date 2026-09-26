@@ -19,6 +19,7 @@ struct ListItemView: View {
                 .frame(width: 48, height: 48)
                 .background(item.iconColor)
                 .clipShape(Circle())
+                .foregroundStyle(.iconForeground)
 
             Text(item.title)
                 .font(AppTypography.title3Semibold)

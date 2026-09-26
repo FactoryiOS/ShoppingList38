@@ -29,3 +29,28 @@ extension ListItem {
         totalCount: 20
     )
 }
+
+// Моки для списка
+
+extension ListItem {
+    
+    static let mocks: [ListItem] = [
+        mock,
+        
+        ListItem(
+            title: "Кошке",
+            icon: .paw,
+            iconColor: ListColor.green.color,
+            currentCount: 1,
+            totalCount: 4
+        ),
+        
+        ListItem(
+            title: "Вечеринка малого",
+            icon: .gameController,
+            iconColor: ListColor.yellow.color,
+            currentCount: 9,
+            totalCount: 20
+        )
+    ]
+}
