@@ -8,6 +8,14 @@
 import Foundation
 import SwiftData
 
+nonisolated enum ShoppingListStoreError: LocalizedError {
+    case duplicateName
+
+    var errorDescription: String? {
+        "Это название уже используется, пожалуйста, измените его."
+    }
+}
+
 /// Выполняет операции со списками в переданном контексте SwiftData.
 @MainActor
 struct ShoppingListStore {
@@ -23,6 +31,8 @@ struct ShoppingListStore {
         color: ListColor,
         icon: ListIcon
     ) throws -> ShoppingList {
+        try validateUniqueName(name)
+
         let shoppingList = ShoppingList(
             name: name,
             color: color,
@@ -41,6 +51,8 @@ struct ShoppingListStore {
         color: ListColor,
         icon: ListIcon
     ) throws {
+        try validateUniqueName(name, excluding: shoppingList.id)
+
         shoppingList.update(
             name: name,
             color: color,
@@ -51,14 +63,17 @@ struct ShoppingListStore {
 
     @discardableResult
     func duplicate(_ shoppingList: ShoppingList) throws -> ShoppingList {
-        let existingNames = try modelContext
+        let existingNormalizedNames = try modelContext
             .fetch(FetchDescriptor<ShoppingList>())
-            .map(\.name)
+            .map(\.normalizedName)
+        let copyName = ShoppingListName.makeCopyName(
+            for: shoppingList.name,
+            existingNormalizedNames: Set(existingNormalizedNames)
+        )
+        try validateUniqueName(copyName)
+
         let copy = ShoppingList(
-            name: makeCopyName(
-                for: shoppingList.name,
-                existingNames: existingNames
-            ),
+            name: copyName,
             color: shoppingList.color,
             icon: shoppingList.icon
         )
@@ -96,39 +111,25 @@ struct ShoppingListStore {
         }
     }
 
-    private func makeCopyName(
-        for name: String,
-        existingNames: [String]
-    ) -> String {
-        let normalizedNames = Set(existingNames.map(Self.normalize))
-        var baseName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        var copyNumber = 1
+    private func validateUniqueName(_ name: String, excluding id: UUID? = nil) throws {
+        let normalizedName = ShoppingListName.normalize(name)
+        let predicate: Predicate<ShoppingList>
 
-        if let separator = baseName.lastIndex(where: { $0.isWhitespace }) {
-            let suffix = baseName[baseName.index(after: separator)...]
-
-            if suffix.allSatisfy({ $0.isNumber }),
-               let number = Int(suffix),
-               number < Int.max {
-                baseName = String(baseName[..<separator])
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                copyNumber = number + 1
+        if let id {
+            predicate = #Predicate { shoppingList in
+                shoppingList.normalizedName == normalizedName && shoppingList.id != id
+            }
+        } else {
+            predicate = #Predicate { shoppingList in
+                shoppingList.normalizedName == normalizedName
             }
         }
 
-        while normalizedNames.contains(Self.normalize("\(baseName) \(copyNumber)")) {
-            copyNumber += 1
+        var descriptor = FetchDescriptor<ShoppingList>(predicate: predicate)
+        descriptor.fetchLimit = 1
+
+        guard try modelContext.fetch(descriptor).isEmpty else {
+            throw ShoppingListStoreError.duplicateName
         }
-
-        return "\(baseName) \(copyNumber)"
-    }
-
-    private static func normalize(_ name: String) -> String {
-        name
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .folding(
-                options: [.caseInsensitive, .diacriticInsensitive],
-                locale: .current
-            )
     }
 }

@@ -2,6 +2,8 @@
 //  ShoppingList.swift
 //  ShoppingList38
 //
+//  Created by Сергей Хмелёв on 27.09.2026.
+//
 
 import Foundation
 import SwiftData
@@ -12,6 +14,7 @@ final class ShoppingList {
     @Attribute(.unique) var id: UUID
 
     private(set) var name: String
+    @Attribute(.unique) private(set) var normalizedName: String
     private(set) var colorRawValue: String
     private(set) var iconRawValue: String
     private(set) var createdAt: Date
@@ -46,6 +49,7 @@ final class ShoppingList {
     ) {
         self.id = id
         self.name = name
+        normalizedName = ShoppingListName.normalize(name)
         colorRawValue = color.rawValue
         iconRawValue = icon.rawValue
         self.createdAt = createdAt
@@ -59,6 +63,7 @@ final class ShoppingList {
         updatedAt: Date = .now
     ) {
         self.name = name
+        normalizedName = ShoppingListName.normalize(name)
         colorRawValue = color.rawValue
         iconRawValue = icon.rawValue
         self.updatedAt = updatedAt

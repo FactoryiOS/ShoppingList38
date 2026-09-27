@@ -129,6 +129,9 @@ extension CreateEditListView {
                 }
 
                 return true
+            } catch ShoppingListStoreError.duplicateName {
+                nameErrorMessage = ShoppingListStoreError.duplicateName.localizedDescription
+                return false
             } catch {
                 persistenceErrorMessage = error.localizedDescription
                 return false
@@ -150,7 +153,7 @@ extension CreateEditListView {
             }
 
             guard !isDuplicateName(in: existingListNames) else {
-                nameErrorMessage = "Это название уже используется, пожалуйста, измените его."
+                nameErrorMessage = ShoppingListStoreError.duplicateName.localizedDescription
                 return nil
             }
 
@@ -170,25 +173,16 @@ extension CreateEditListView {
         private func isDuplicateName(
             in existingListNames: [String]
         ) -> Bool {
-            let normalizedName = Self.normalize(trimmedListName)
+            let normalizedName = ShoppingListName.normalize(trimmedListName)
 
             if let originalListName,
-               normalizedName == Self.normalize(originalListName) {
+               normalizedName == ShoppingListName.normalize(originalListName) {
                 return false
             }
 
             return existingListNames
-                .map(Self.normalize)
+                .map(ShoppingListName.normalize)
                 .contains(normalizedName)
-        }
-
-        private static func normalize(_ name: String) -> String {
-            name
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .folding(
-                    options: [.caseInsensitive, .diacriticInsensitive],
-                    locale: .current
-                )
         }
     }
 }
