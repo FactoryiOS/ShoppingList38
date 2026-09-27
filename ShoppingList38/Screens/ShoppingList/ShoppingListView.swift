@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct ShoppingListView: View {
-    @State private var observed = Observed()
+    @State private var observed: Observed
+
+    init(listTitle: String) {
+        _observed = State(
+            initialValue: Observed(listTitle: listTitle)
+        )
+    }
 
     var body: some View {
         @Bindable var observed = observed
@@ -44,6 +50,8 @@ struct ShoppingListView: View {
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: "Поиск"
         )
+        .navigationTitle(observed.listTitle)
+        .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
             AppButton(
                 title: "Добавить товар",
@@ -66,6 +74,6 @@ struct ShoppingListView: View {
 
 #Preview {
     NavigationStack {
-        ShoppingListView()
+        ShoppingListView(listTitle: "Новый год")
     }
 }

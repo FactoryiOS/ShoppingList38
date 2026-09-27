@@ -15,7 +15,7 @@ extension ShoppingListView {
         var searchText = ""
 
         init(
-            listTitle: String = "Новый год",
+            listTitle: String,
             items: [ShoppingItem] = ShoppingItem.mocks
         ) {
             self.listTitle = listTitle
