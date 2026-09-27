@@ -13,6 +13,8 @@ extension ShoppingListView {
         var listTitle: String
         var items: [ShoppingItem]
         var searchText = ""
+        var isCreatingItem = false
+        var itemBeingEdited: ShoppingItem?
 
         init(
             listTitle: String,
@@ -34,11 +36,11 @@ extension ShoppingListView {
         }
 
         func handleEditItem(_ item: ShoppingItem) {
-            print("Edit item: \(item.title)")
+            itemBeingEdited = item
         }
 
         func handleAddItem() {
-            print("Add item tapped")
+            isCreatingItem = true
         }
 
         func handleMoreTapped() {

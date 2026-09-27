@@ -52,6 +52,12 @@ struct ShoppingListView: View {
         )
         .navigationTitle(observed.listTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $observed.isCreatingItem) {
+            CreateEditItemView(mode: .create)
+        }
+        .navigationDestination(item: $observed.itemBeingEdited) { item in
+            CreateEditItemView(mode: .edit, item: item)
+        }
         .safeAreaInset(edge: .bottom) {
             AppButton(
                 title: "Добавить товар",
