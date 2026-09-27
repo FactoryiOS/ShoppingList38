@@ -27,9 +27,9 @@ struct ListItemView: View {
             Spacer()
 
             HStack(spacing: 0) {
-                Text("0/")
+                Text("\(shoppingList.purchasedItemsCount)/")
                     .font(AppTypography.body)
-                Text("0")
+                Text("\(shoppingList.totalItemsCount)")
                     .font(AppTypography.headline)
             }
         }

@@ -23,6 +23,6 @@ struct ShoppingList38App: App {
         WindowGroup {
             RootView(appState: appState)
         }
-        .modelContainer(for: ShoppingList.self)
+        .modelContainer(for: [ShoppingList.self, ShoppingItem.self])
     }
 }

@@ -17,12 +17,23 @@ final class ShoppingList {
     private(set) var createdAt: Date
     private(set) var updatedAt: Date
 
+    @Relationship(deleteRule: .cascade, inverse: \ShoppingItem.shoppingList)
+    private(set) var items: [ShoppingItem] = []
+
     var color: ListColor {
         ListColor(rawValue: colorRawValue) ?? .blue
     }
 
     var icon: ListIcon {
         ListIcon(rawValue: iconRawValue) ?? .cart
+    }
+
+    var purchasedItemsCount: Int {
+        items.filter(\.isPurchased).count
+    }
+
+    var totalItemsCount: Int {
+        items.count
     }
 
     init(

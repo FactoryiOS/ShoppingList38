@@ -5,88 +5,134 @@
 //  Created by Leo Gabuev on 21.09.2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct CreateEditItemView: View {
-    
-    @State private var viewModel: CreateEditItemViewModel
     @Environment(\.dismiss) private var dismiss
-    
-    init(mode: CreateEditItemViewModel.Mode, item: ShoppingItem? = nil) {
-        _viewModel = State(
-            initialValue: CreateEditItemViewModel(mode: mode, item: item)
+    @Environment(\.modelContext) private var modelContext
+
+    @State private var observed: Observed
+
+    private let shoppingList: ShoppingList
+    private let item: ShoppingItem?
+
+    init(
+        shoppingList: ShoppingList,
+        item: ShoppingItem? = nil
+    ) {
+        self.shoppingList = shoppingList
+        self.item = item
+        _observed = State(
+            initialValue: Observed(item: item)
         )
     }
-    
+
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
+        @Bindable var observed = observed
+
+        VStack(spacing: 20) {
+            AppTextField(
+                placeholder: "Введите название",
+                errorMessage: nil,
+                text: $observed.itemName
+            )
+
+            HStack(spacing: 16) {
                 AppTextField(
-                    placeholder: "Введите название",
+                    placeholder: "Количество",
                     errorMessage: nil,
-                    text: $viewModel.itemName
+                    text: $observed.quantityText
                 )
-                
-                HStack(spacing: 16) {
-                    AppTextField(
-                        placeholder: "Количество",
-                        errorMessage: nil,
-                        text: $viewModel.quantityText
+                .keyboardType(.decimalPad)
+
+                Text(observed.unit)
+                    .font(AppTypography.body)
+                    .foregroundStyle(.secondary)
+                    .frame(
+                        maxWidth: .infinity,
+                        minHeight: 54,
+                        alignment: .leading
                     )
-                    .keyboardType(.decimalPad)
-                    
-                    Text(viewModel.unit)
-                        .font(AppTypography.body)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, minHeight: 54, alignment: .leading)
-                        .padding(.horizontal, 16)
-                        .background(.surfaceBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    
-                }
-                
-                Spacer()
+                    .padding(.horizontal, 16)
+                    .background(.surfaceBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .background(.appBackground)
-            
-            .navigationTitle(viewModel.navigationTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Отменить") {
-                        dismiss()
-                    }
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Готово") {
-                        viewModel.saveItem()
-                        dismiss()
-                    }
-                    .disabled(!viewModel.isFormValid)
+
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .background(.appBackground)
+        .navigationTitle(observed.navigationTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Отменить", action: dismiss.callAsFunction)
+            }
+
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Готово", action: handleSave)
+                    .disabled(!observed.isFormValid)
                     .fontWeight(.semibold)
-                }
             }
         }
+        .alert(
+            "Не удалось сохранить товар",
+            isPresented: $observed.isShowingPersistenceError
+        ) {
+            Button("OK", role: .cancel) {
+                observed.handlePersistenceErrorDismissal()
+            }
+        } message: {
+            Text(observed.persistenceErrorMessage ?? "Неизвестная ошибка")
+        }
+    }
+
+    private func handleSave() {
+        guard observed.handleSave(
+            shoppingList: shoppingList,
+            item: item,
+            modelContext: modelContext
+        ) else {
+            return
+        }
+
+        dismiss()
     }
 }
 
 #Preview("Создание") {
-    CreateEditItemView(mode: .create)
+    let shoppingList = ShoppingList(
+        name: "Новый год",
+        color: .blue,
+        icon: .calendar
+    )
+
+    NavigationStack {
+        CreateEditItemView(shoppingList: shoppingList)
+    }
+    .modelContainer(
+        for: [ShoppingList.self, ShoppingItem.self],
+        inMemory: true
+    )
 }
 
 #Preview("Редактирование") {
-    CreateEditItemView(mode: .edit, item: ShoppingItem.mock)
-}
+    let shoppingList = ShoppingList(
+        name: "Новый год",
+        color: .blue,
+        icon: .calendar
+    )
 
-#Preview("Dark Mode - Create") {
-    CreateEditItemView(mode: .create)
-        .environment(\.colorScheme, .dark)
-}
-
-#Preview("Dark Mode - Edit") {
-    CreateEditItemView(mode: .edit, item: ShoppingItem.mock)
-        .environment(\.colorScheme, .dark)
+    NavigationStack {
+        CreateEditItemView(
+            shoppingList: shoppingList,
+            item: .mock
+        )
+    }
+    .modelContainer(
+        for: [ShoppingList.self, ShoppingItem.self],
+        inMemory: true
+    )
 }

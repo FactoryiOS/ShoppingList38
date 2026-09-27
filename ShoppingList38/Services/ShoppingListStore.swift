@@ -2,6 +2,8 @@
 //  ShoppingListStore.swift
 //  ShoppingList38
 //
+//  Created by Сергей Хмелёв on 27.09.2026.
+//
 
 import Foundation
 import SwiftData

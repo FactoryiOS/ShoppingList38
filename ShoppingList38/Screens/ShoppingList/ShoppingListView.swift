@@ -5,58 +5,59 @@
 //  Created by Сергей Бушков on 22.09.2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct ShoppingListView: View {
-    @State private var observed: Observed
+    enum ItemDestination: Hashable {
+        case create
+        case edit(ShoppingItem)
+    }
 
-    init(listTitle: String) {
-        _observed = State(
-            initialValue: Observed(listTitle: listTitle)
+    @Environment(\.modelContext) private var modelContext
+
+    @Query private var items: [ShoppingItem]
+
+    @State private var observed = Observed()
+
+    private let shoppingList: ShoppingList
+
+    init(shoppingList: ShoppingList) {
+        self.shoppingList = shoppingList
+
+        let shoppingListID = shoppingList.id
+        _items = Query(
+            filter: #Predicate<ShoppingItem> { item in
+                item.shoppingList?.id == shoppingListID
+            },
+            sort: [SortDescriptor(\ShoppingItem.createdAt)]
         )
     }
 
     var body: some View {
         @Bindable var observed = observed
 
-        List {
-            ForEach(observed.filteredItemIndices, id: \.self) { index in
-                ShoppingItemView(item: $observed.items[index])
-                    .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color("SurfaceBackground"))
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button {
-                            observed.deleteItem(observed.items[index])
-                        } label: {
-                            Image(systemName: "trash")
-                        }
-                        .tint(.deleteAction)
-
-                        Button {
-                            observed.handleEditItem(observed.items[index])
-                        } label: {
-                            Image(systemName: "square.and.pencil")
-                        }
-                        .tint(.editAction)
-                    }
-            }
+        VStack(spacing: 0) {
+            itemsList
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
         .background(Color("SurfaceBackground"))
         .searchable(
             text: $observed.searchText,
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: "Поиск"
         )
-        .navigationTitle(observed.listTitle)
+        .navigationTitle(shoppingList.name)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $observed.isCreatingItem) {
-            CreateEditItemView(mode: .create)
-        }
-        .navigationDestination(item: $observed.itemBeingEdited) { item in
-            CreateEditItemView(mode: .edit, item: item)
+        .navigationDestination(item: $observed.itemDestination) { destination in
+            switch destination {
+            case .create:
+                CreateEditItemView(shoppingList: shoppingList)
+            case .edit(let item):
+                CreateEditItemView(
+                    shoppingList: shoppingList,
+                    item: item
+                )
+            }
         }
         .safeAreaInset(edge: .bottom) {
             AppButton(
@@ -75,11 +76,67 @@ struct ShoppingListView: View {
                 }
             }
         }
+        .alert(
+            "Не удалось изменить товар",
+            isPresented: $observed.isShowingPersistenceError
+        ) {
+            Button("OK", role: .cancel) {
+                observed.handlePersistenceErrorDismissal()
+            }
+        } message: {
+            Text(observed.persistenceErrorMessage ?? "Неизвестная ошибка")
+        }
+    }
+
+    private var itemsList: some View {
+        List {
+            ForEach(observed.filteredItems(items)) { item in
+                ShoppingItemView(item: item) {
+                    observed.handleTogglePurchased(
+                        item,
+                        modelContext: modelContext
+                    )
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color("SurfaceBackground"))
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        observed.handleDelete(
+                            item,
+                            modelContext: modelContext
+                        )
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .tint(.deleteAction)
+
+                    Button {
+                        observed.handleEditItem(item)
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                    .tint(.editAction)
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 }
 
 #Preview {
+    let shoppingList = ShoppingList(
+        name: "Новый год",
+        color: .blue,
+        icon: .calendar
+    )
+
     NavigationStack {
-        ShoppingListView(listTitle: "Новый год")
+        ShoppingListView(shoppingList: shoppingList)
     }
+    .modelContainer(
+        for: [ShoppingList.self, ShoppingItem.self],
+        inMemory: true
+    )
 }

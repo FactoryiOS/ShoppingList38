@@ -6,45 +6,83 @@
 //
 
 import Foundation
+import Observation
+import SwiftData
 
 extension ShoppingListView {
+    @MainActor
     @Observable
     final class Observed {
-        var listTitle: String
-        var items: [ShoppingItem]
         var searchText = ""
-        var isCreatingItem = false
-        var itemBeingEdited: ShoppingItem?
+        var itemDestination: ItemDestination?
+        private(set) var persistenceErrorMessage: String?
 
-        init(
-            listTitle: String,
-            items: [ShoppingItem] = ShoppingItem.mocks
-        ) {
-            self.listTitle = listTitle
-            self.items = items
-        }
-        
-        var filteredItemIndices: [Int] {
-            items.indices.filter { index in
-                searchText.isEmpty ||
-                items[index].title.localizedCaseInsensitiveContains(searchText)
+        var isShowingPersistenceError: Bool {
+            get {
+                persistenceErrorMessage != nil
+            }
+            set {
+                if !newValue {
+                    persistenceErrorMessage = nil
+                }
             }
         }
 
-        func deleteItem(_ item: ShoppingItem) {
-            items.removeAll { $0.id == item.id }
+        func filteredItems(_ items: [ShoppingItem]) -> [ShoppingItem] {
+            guard !searchText.isEmpty else {
+                return items
+            }
+
+            return items.filter {
+                $0.title.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+
+        func handleDelete(
+            _ item: ShoppingItem,
+            modelContext: ModelContext
+        ) {
+            handlePersistenceOperation {
+                try makeStore(modelContext: modelContext).delete(item)
+            }
+        }
+
+        func handleTogglePurchased(
+            _ item: ShoppingItem,
+            modelContext: ModelContext
+        ) {
+            handlePersistenceOperation {
+                try makeStore(modelContext: modelContext).togglePurchased(item)
+            }
         }
 
         func handleEditItem(_ item: ShoppingItem) {
-            itemBeingEdited = item
+            itemDestination = .edit(item)
         }
 
         func handleAddItem() {
-            isCreatingItem = true
+            itemDestination = .create
         }
 
         func handleMoreTapped() {
-            print("More tapped")
+        }
+
+        func handlePersistenceErrorDismissal() {
+            persistenceErrorMessage = nil
+        }
+
+        private func handlePersistenceOperation(
+            _ operation: () throws -> Void
+        ) {
+            do {
+                try operation()
+            } catch {
+                persistenceErrorMessage = error.localizedDescription
+            }
+        }
+
+        private func makeStore(modelContext: ModelContext) -> ShoppingItemStore {
+            ShoppingItemStore(modelContext: modelContext)
         }
     }
 }

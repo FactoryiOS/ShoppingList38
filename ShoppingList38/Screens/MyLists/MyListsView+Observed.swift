@@ -14,7 +14,6 @@ extension MyListsView {
     @Observable
     final class Observed {
         var isCreatingList = false
-        var listBeingViewed: ShoppingList?
         var listBeingEdited: ShoppingList?
         private(set) var listPendingDeletion: ShoppingList?
         private(set) var persistenceErrorMessage: String?
@@ -43,10 +42,6 @@ extension MyListsView {
 
         func handleCreateButtonTapped() {
             isCreatingList = true
-        }
-
-        func handleListTapped(_ shoppingList: ShoppingList) {
-            listBeingViewed = shoppingList
         }
 
         func handleEditButtonTapped(for shoppingList: ShoppingList) {

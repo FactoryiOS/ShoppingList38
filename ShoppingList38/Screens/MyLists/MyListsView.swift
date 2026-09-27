@@ -45,8 +45,8 @@ struct MyListsView: View {
         .navigationDestination(isPresented: $observed.isCreatingList) {
             createListView
         }
-        .navigationDestination(item: $observed.listBeingViewed) { shoppingList in
-            ShoppingListView(listTitle: shoppingList.name)
+        .navigationDestination(for: ShoppingList.self) { shoppingList in
+            ShoppingListView(shoppingList: shoppingList)
         }
         .navigationDestination(item: $observed.listBeingEdited) { shoppingList in
             editListView(shoppingList)
@@ -101,12 +101,11 @@ struct MyListsView: View {
 
     private var listsView: some View {
         List(shoppingLists) { shoppingList in
-            Button {
-                observed.handleListTapped(shoppingList)
-            } label: {
+            NavigationLink(value: shoppingList) {
                 ListItemView(shoppingList: shoppingList)
             }
                 .buttonStyle(.plain)
+                .navigationLinkIndicatorVisibility(.hidden)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
                         observed.handleDeleteButtonTapped(for: shoppingList)
@@ -183,7 +182,10 @@ struct MyListsView: View {
     NavigationStack {
         MyListsView()
     }
-    .modelContainer(for: ShoppingList.self, inMemory: true)
+    .modelContainer(
+        for: [ShoppingList.self, ShoppingItem.self],
+        inMemory: true
+    )
 }
 
 #Preview("My lists (data)") {
@@ -199,7 +201,7 @@ private func makeMyListsPreviewContainer() -> ModelContainer {
 
     do {
         let container = try ModelContainer(
-            for: ShoppingList.self,
+            for: ShoppingList.self, ShoppingItem.self,
             configurations: configuration
         )
         let shoppingLists = [

@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct ShoppingItemView: View {
-    @Binding var item: ShoppingItem
+    let item: ShoppingItem
+    let onTogglePurchased: () -> Void
 
     var body: some View {
         HStack(spacing: 12) {
@@ -20,7 +21,7 @@ struct ShoppingItemView: View {
 
             Spacer()
 
-            Text("\(item.quantity) \(item.unit)")
+            Text("\(formattedQuantity) \(item.unit)")
                 .font(AppTypography.body)
                 .foregroundStyle(textColor)
         }
@@ -33,14 +34,18 @@ struct ShoppingItemView: View {
         }
     }
 
+    private var formattedQuantity: String {
+        item.quantity.formatted(
+            .number.precision(.fractionLength(0...2))
+        )
+    }
+
     private var textColor: Color {
         item.isPurchased ? Color("ListSecondaryText") : Color("PrimaryText")
     }
 
     private var checkboxView: some View {
-        Button {
-            item.isPurchased.toggle()
-        } label: {
+        Button(action: onTogglePurchased) {
             Group {
                 if item.isPurchased {
                     ZStack {
@@ -61,15 +66,21 @@ struct ShoppingItemView: View {
             .frame(width: 44, height: 44)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(
+            item.isPurchased ? "Отметить как некупленное" : "Отметить как купленное"
+        )
     }
 }
 
 #Preview {
-    @Previewable @State var notPurchasedItem = ShoppingItem.mockNotPurchased
-    @Previewable @State var purchasedItem = ShoppingItem.mockPurchased
-
     VStack(spacing: 0) {
-        ShoppingItemView(item: $notPurchasedItem)
-        ShoppingItemView(item: $purchasedItem)
+        ShoppingItemView(
+            item: .mockNotPurchased,
+            onTogglePurchased: {}
+        )
+        ShoppingItemView(
+            item: .mockPurchased,
+            onTogglePurchased: {}
+        )
     }
 }
