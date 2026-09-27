@@ -5,6 +5,7 @@
 //  Created by Nikita Tsomuk on 07.09.2026.
 //
 
+import SwiftData
 import SwiftUI
 
 @main
@@ -22,5 +23,6 @@ struct ShoppingList38App: App {
         WindowGroup {
             RootView(appState: appState)
         }
+        .modelContainer(for: ShoppingList.self)
     }
 }

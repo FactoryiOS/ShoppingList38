@@ -12,7 +12,7 @@ struct CreateEditItemView: View {
     @State private var viewModel: CreateEditItemViewModel
     @Environment(\.dismiss) private var dismiss
     
-    init(mode: CreateEditItemViewModel.Mode, item: ListItem? = nil) {
+    init(mode: CreateEditItemViewModel.Mode, item: ShoppingItem? = nil) {
         _viewModel = State(
             initialValue: CreateEditItemViewModel(mode: mode, item: item)
         )
@@ -78,7 +78,7 @@ struct CreateEditItemView: View {
 }
 
 #Preview("Редактирование") {
-    CreateEditItemView(mode: .edit, item: ListItem.mock)
+    CreateEditItemView(mode: .edit, item: ShoppingItem.mock)
 }
 
 #Preview("Dark Mode - Create") {
@@ -87,6 +87,6 @@ struct CreateEditItemView: View {
 }
 
 #Preview("Dark Mode - Edit") {
-    CreateEditItemView(mode: .edit, item: ListItem.mock)
+    CreateEditItemView(mode: .edit, item: ShoppingItem.mock)
         .environment(\.colorScheme, .dark)
 }

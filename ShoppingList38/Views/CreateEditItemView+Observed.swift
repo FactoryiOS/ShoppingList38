@@ -42,7 +42,7 @@ final class CreateEditItemViewModel {
         return true
     }
     
-    init(mode: Mode, item: ListItem? = nil) {
+    init(mode: Mode, item: ShoppingItem? = nil) {
         self.mode = mode
         
         guard mode == .edit, let item else {
@@ -50,7 +50,7 @@ final class CreateEditItemViewModel {
         }
         
         itemName = item.title
-        quantityText = String(item.currentCount)
+        quantityText = String(item.quantity)
     }
     
     func saveItem() {

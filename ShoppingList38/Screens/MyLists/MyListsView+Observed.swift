@@ -1,0 +1,104 @@
+//
+//  MyListsView+Observed.swift
+//  ShoppingList38
+//
+
+import Foundation
+import Observation
+import SwiftData
+
+extension MyListsView {
+    @MainActor
+    @Observable
+    final class Observed {
+        var isCreatingList = false
+        var listBeingEdited: ShoppingList?
+        private(set) var persistenceErrorMessage: String?
+
+        var isShowingPersistenceError: Bool {
+            get {
+                persistenceErrorMessage != nil
+            }
+            set {
+                if !newValue {
+                    persistenceErrorMessage = nil
+                }
+            }
+        }
+
+        func handleCreateButtonTapped() {
+            isCreatingList = true
+        }
+
+        func handleEditButtonTapped(for shoppingList: ShoppingList) {
+            listBeingEdited = shoppingList
+        }
+
+        func handlePersistenceErrorDismissal() {
+            persistenceErrorMessage = nil
+        }
+
+        func handleCreate(
+            _ draft: CreateEditListView.ListDraft,
+            modelContext: ModelContext
+        ) -> Bool {
+            handlePersistenceOperation {
+                _ = try makeStore(modelContext: modelContext).create(
+                    name: draft.name,
+                    color: draft.color,
+                    icon: draft.icon
+                )
+            }
+        }
+
+        func handleUpdate(
+            _ shoppingList: ShoppingList,
+            with draft: CreateEditListView.ListDraft,
+            modelContext: ModelContext
+        ) -> Bool {
+            handlePersistenceOperation {
+                try makeStore(modelContext: modelContext).update(
+                    shoppingList,
+                    name: draft.name,
+                    color: draft.color,
+                    icon: draft.icon
+                )
+            }
+        }
+
+        func handleDuplicate(
+            _ shoppingList: ShoppingList,
+            modelContext: ModelContext
+        ) {
+            handlePersistenceOperation {
+                _ = try makeStore(modelContext: modelContext).duplicate(shoppingList)
+            }
+        }
+
+        func handleDelete(
+            _ shoppingList: ShoppingList,
+            modelContext: ModelContext
+        ) {
+            handlePersistenceOperation {
+                try makeStore(modelContext: modelContext).delete(shoppingList)
+            }
+        }
+
+        @discardableResult
+        private func handlePersistenceOperation(
+            _ operation: () throws -> Void
+        ) -> Bool {
+            do {
+                try operation()
+                return true
+            } catch {
+                persistenceErrorMessage = error.localizedDescription
+                return false
+            }
+        }
+
+        private func makeStore(modelContext: ModelContext) -> ShoppingListStore {
+            ShoppingListStore(modelContext: modelContext)
+        }
+    }
+}
