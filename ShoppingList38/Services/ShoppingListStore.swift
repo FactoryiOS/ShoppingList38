@@ -64,6 +64,19 @@ struct ShoppingListStore {
         )
 
         modelContext.insert(copy)
+
+        for item in shoppingList.items.sorted(by: { $0.createdAt < $1.createdAt }) {
+            let itemCopy = ShoppingItem(
+                title: item.title,
+                quantity: item.quantity,
+                unit: item.unit,
+                isPurchased: false,
+                shoppingList: copy
+            )
+
+            modelContext.insert(itemCopy)
+        }
+
         try saveChanges()
 
         return copy
@@ -88,19 +101,26 @@ struct ShoppingListStore {
         existingNames: [String]
     ) -> String {
         let normalizedNames = Set(existingNames.map(Self.normalize))
-        let firstCandidate = "\(name) (копия)"
+        var baseName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        var copyNumber = 1
 
-        guard normalizedNames.contains(Self.normalize(firstCandidate)) else {
-            return firstCandidate
+        if let separator = baseName.lastIndex(where: { $0.isWhitespace }) {
+            let suffix = baseName[baseName.index(after: separator)...]
+
+            if suffix.allSatisfy({ $0.isNumber }),
+               let number = Int(suffix),
+               number < Int.max {
+                baseName = String(baseName[..<separator])
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                copyNumber = number + 1
+            }
         }
 
-        var copyNumber = 2
-
-        while normalizedNames.contains(Self.normalize("\(name) (копия \(copyNumber))")) {
+        while normalizedNames.contains(Self.normalize("\(baseName) \(copyNumber)")) {
             copyNumber += 1
         }
 
-        return "\(name) (копия \(copyNumber))"
+        return "\(baseName) \(copyNumber)"
     }
 
     private static func normalize(_ name: String) -> String {
