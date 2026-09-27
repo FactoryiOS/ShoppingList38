@@ -109,8 +109,13 @@ extension CreateEditItemView {
         }
 
         private static func quantityText(for item: ShoppingItem) -> String {
-            item.quantity.formatted(
-                .number.precision(.fractionLength(0...2))
+            // String(Double) сохраняет точность и не добавляет разделители групп.
+            let text = String(item.quantity)
+            let editableText = text.hasSuffix(".0") ? String(text.dropLast(2)) : text
+
+            return editableText.replacingOccurrences(
+                of: ".",
+                with: Locale.current.decimalSeparator ?? "."
             )
         }
     }
