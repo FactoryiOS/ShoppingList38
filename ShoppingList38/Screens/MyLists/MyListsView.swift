@@ -49,6 +49,24 @@ struct MyListsView: View {
             editListView(shoppingList)
         }
         .alert(
+            "Удаление списка",
+            isPresented: $observed.isShowingDeleteConfirmation,
+            presenting: observed.listPendingDeletion
+        ) { shoppingList in
+            Button("Отменить", role: .cancel) {
+                observed.handleDeleteCancellation()
+            }
+
+            Button("Удалить", role: .destructive) {
+                observed.handleDeleteConfirmation(
+                    shoppingList,
+                    modelContext: modelContext
+                )
+            }
+        } message: { _ in
+            Text("Вы действительно хотите удалить список?")
+        }
+        .alert(
             "Не удалось изменить списки",
             isPresented: $observed.isShowingPersistenceError
         ) {
@@ -83,10 +101,7 @@ struct MyListsView: View {
             ListItemView(shoppingList: shoppingList)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
-                        observed.handleDelete(
-                            shoppingList,
-                            modelContext: modelContext
-                        )
+                        observed.handleDeleteButtonTapped(for: shoppingList)
                     } label: {
                         Image(systemName: "trash")
                     }
@@ -156,9 +171,54 @@ struct MyListsView: View {
     }
 }
 
-#Preview("My lists") {
+#Preview("My lists (empty)") {
     NavigationStack {
         MyListsView()
     }
     .modelContainer(for: ShoppingList.self, inMemory: true)
+}
+
+#Preview("My lists (data)") {
+    NavigationStack {
+        MyListsView()
+    }
+    .modelContainer(makeMyListsPreviewContainer())
+}
+
+@MainActor
+private func makeMyListsPreviewContainer() -> ModelContainer {
+    let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+
+    do {
+        let container = try ModelContainer(
+            for: ShoppingList.self,
+            configurations: configuration
+        )
+        let shoppingLists = [
+            ShoppingList(
+                name: "Новый год",
+                color: .blue,
+                icon: .calendar
+            ),
+            ShoppingList(
+                name: "Кошке",
+                color: .green,
+                icon: .paw
+            ),
+            ShoppingList(
+                name: "Вечеринка малого",
+                color: .yellow,
+                icon: .gameController
+            )
+        ]
+
+        for shoppingList in shoppingLists {
+            container.mainContext.insert(shoppingList)
+        }
+
+        try container.mainContext.save()
+        return container
+    } catch {
+        fatalError("Не удалось создать ModelContainer для Preview: \(error)")
+    }
 }

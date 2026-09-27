@@ -13,7 +13,19 @@ extension MyListsView {
     final class Observed {
         var isCreatingList = false
         var listBeingEdited: ShoppingList?
+        private(set) var listPendingDeletion: ShoppingList?
         private(set) var persistenceErrorMessage: String?
+
+        var isShowingDeleteConfirmation: Bool {
+            get {
+                listPendingDeletion != nil
+            }
+            set {
+                if !newValue {
+                    listPendingDeletion = nil
+                }
+            }
+        }
 
         var isShowingPersistenceError: Bool {
             get {
@@ -32,6 +44,14 @@ extension MyListsView {
 
         func handleEditButtonTapped(for shoppingList: ShoppingList) {
             listBeingEdited = shoppingList
+        }
+
+        func handleDeleteButtonTapped(for shoppingList: ShoppingList) {
+            listPendingDeletion = shoppingList
+        }
+
+        func handleDeleteCancellation() {
+            listPendingDeletion = nil
         }
 
         func handlePersistenceErrorDismissal() {
@@ -75,10 +95,12 @@ extension MyListsView {
             }
         }
 
-        func handleDelete(
+        func handleDeleteConfirmation(
             _ shoppingList: ShoppingList,
             modelContext: ModelContext
         ) {
+            listPendingDeletion = nil
+
             handlePersistenceOperation {
                 try makeStore(modelContext: modelContext).delete(shoppingList)
             }
