@@ -14,7 +14,6 @@ extension ShoppingListView {
     @Observable
     final class Observed {
         var searchText = ""
-        var itemDestination: ItemDestination?
         private(set) var persistenceErrorMessage: String?
 
         var isShowingPersistenceError: Bool {
@@ -56,12 +55,26 @@ extension ShoppingListView {
             }
         }
 
-        func handleEditItem(_ item: ShoppingItem) {
-            itemDestination = .edit(item)
+        func handleEditItem(
+            _ item: ShoppingItem,
+            in shoppingList: ShoppingList,
+            router: AppRouter
+        ) {
+            router.navigate(
+                to: .editItem(
+                    shoppingList: shoppingList,
+                    item: item
+                )
+            )
         }
 
-        func handleAddItem() {
-            itemDestination = .create
+        func handleAddItem(
+            to shoppingList: ShoppingList,
+            router: AppRouter
+        ) {
+            router.navigate(
+                to: .createItem(shoppingList: shoppingList)
+            )
         }
 
         func handleMoreTapped() {

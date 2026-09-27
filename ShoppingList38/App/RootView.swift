@@ -17,7 +17,7 @@ struct RootView: View {
                 appState.handleWelcomeCompletion()
             }
         case .content:
-            NavigationStack {
+            AppNavigationStack {
                 MyListsView()
             }
         }

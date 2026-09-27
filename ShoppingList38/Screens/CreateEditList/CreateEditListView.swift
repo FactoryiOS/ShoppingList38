@@ -5,6 +5,7 @@
 //  Created by Сергей Хмелёв on 24.09.2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct CreateEditListView: View {
@@ -32,25 +33,35 @@ struct CreateEditListView: View {
 
     /// Системное действие закрытия текущего экрана.
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+
+    @Query(sort: \ShoppingList.createdAt, order: .reverse)
+    private var shoppingLists: [ShoppingList]
 
     /// Наблюдаемое состояние и логика формы.
     @State private var observed: Observed
 
-    /// Обработчик сохранения, возвращающий признак успешного завершения операции.
-    private let onSave: (ListDraft) -> Bool
+    /// Редактируемый список; `nil` в режиме создания.
+    private let shoppingList: ShoppingList?
 
-    init(
-        mode: Mode,
-        existingListNames: [String] = [],
-        onSave: @escaping (ListDraft) -> Bool
-    ) {
-        _observed = State(
-            initialValue: Observed(
-                mode: mode,
-                existingListNames: existingListNames
+    init(shoppingList: ShoppingList? = nil) {
+        self.shoppingList = shoppingList
+
+        let mode: Mode
+
+        if let shoppingList {
+            mode = .edit(
+                name: shoppingList.name,
+                color: shoppingList.color,
+                icon: shoppingList.icon
             )
+        } else {
+            mode = .create
+        }
+
+        _observed = State(
+            initialValue: Observed(mode: mode)
         )
-        self.onSave = onSave
     }
 
     var body: some View {
@@ -98,6 +109,16 @@ struct CreateEditListView: View {
             .padding(.bottom, 20)
             .background(Color.appBackground)
         }
+        .alert(
+            "Не удалось сохранить список",
+            isPresented: $observed.isShowingPersistenceError
+        ) {
+            Button("OK", role: .cancel) {
+                observed.handlePersistenceErrorDismissal()
+            }
+        } message: {
+            Text(observed.persistenceErrorMessage ?? "Неизвестная ошибка")
+        }
     }
 
     private var navigationHeader: some View {
@@ -122,11 +143,11 @@ struct CreateEditListView: View {
     }
 
     private func handleSave() {
-        guard let draft = observed.handleSave() else {
-            return
-        }
-
-        guard onSave(draft) else {
+        guard observed.handleSave(
+            shoppingList: shoppingList,
+            existingListNames: shoppingLists.map(\.name),
+            modelContext: modelContext
+        ) else {
             return
         }
 
@@ -135,51 +156,57 @@ struct CreateEditListView: View {
 }
 
 #Preview("Создание (Light mode)") {
-    NavigationStack {
-        CreateEditListView(
-            mode: .create,
-            existingListNames: ["Новый год"],
-            onSave: { _ in true }
-        )
+    AppNavigationStack {
+        CreateEditListView()
     }
+    .modelContainer(
+        for: [ShoppingList.self, ShoppingItem.self],
+        inMemory: true
+    )
     .preferredColorScheme(.light)
 }
 
 #Preview("Создание (Dark mode)") {
-    NavigationStack {
-        CreateEditListView(
-            mode: .create,
-            existingListNames: ["Новый год"],
-            onSave: { _ in true }
-        )
+    AppNavigationStack {
+        CreateEditListView()
     }
+    .modelContainer(
+        for: [ShoppingList.self, ShoppingItem.self],
+        inMemory: true
+    )
     .preferredColorScheme(.dark)
 }
 
 #Preview("Редактирование (Light mode)") {
-    NavigationStack {
-        CreateEditListView(
-            mode: .edit(
-                name: "Новый год",
-                color: .blue,
-                icon: .snowflake
-            ),
-            onSave: { _ in true }
-        )
+    let shoppingList = ShoppingList(
+        name: "Новый год",
+        color: .blue,
+        icon: .snowflake
+    )
+
+    AppNavigationStack {
+        CreateEditListView(shoppingList: shoppingList)
     }
+    .modelContainer(
+        for: [ShoppingList.self, ShoppingItem.self],
+        inMemory: true
+    )
     .preferredColorScheme(.light)
 }
 
 #Preview("Редактирование (Dark Mode)") {
-    NavigationStack {
-        CreateEditListView(
-            mode: .edit(
-                name: "Новый год",
-                color: .blue,
-                icon: .snowflake
-            ),
-            onSave: { _ in true }
-        )
+    let shoppingList = ShoppingList(
+        name: "Новый год",
+        color: .blue,
+        icon: .snowflake
+    )
+
+    AppNavigationStack {
+        CreateEditListView(shoppingList: shoppingList)
     }
+    .modelContainer(
+        for: [ShoppingList.self, ShoppingItem.self],
+        inMemory: true
+    )
     .preferredColorScheme(.dark)
 }

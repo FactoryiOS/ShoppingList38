@@ -13,8 +13,6 @@ extension MyListsView {
     @MainActor
     @Observable
     final class Observed {
-        var isCreatingList = false
-        var listBeingEdited: ShoppingList?
         private(set) var listPendingDeletion: ShoppingList?
         private(set) var persistenceErrorMessage: String?
 
@@ -40,12 +38,15 @@ extension MyListsView {
             }
         }
 
-        func handleCreateButtonTapped() {
-            isCreatingList = true
+        func handleCreateButtonTapped(router: AppRouter) {
+            router.navigate(to: .createList)
         }
 
-        func handleEditButtonTapped(for shoppingList: ShoppingList) {
-            listBeingEdited = shoppingList
+        func handleEditButtonTapped(
+            for shoppingList: ShoppingList,
+            router: AppRouter
+        ) {
+            router.navigate(to: .editList(shoppingList))
         }
 
         func handleDeleteButtonTapped(for shoppingList: ShoppingList) {
@@ -58,34 +59,6 @@ extension MyListsView {
 
         func handlePersistenceErrorDismissal() {
             persistenceErrorMessage = nil
-        }
-
-        func handleCreate(
-            _ draft: CreateEditListView.ListDraft,
-            modelContext: ModelContext
-        ) -> Bool {
-            handlePersistenceOperation {
-                _ = try makeStore(modelContext: modelContext).create(
-                    name: draft.name,
-                    color: draft.color,
-                    icon: draft.icon
-                )
-            }
-        }
-
-        func handleUpdate(
-            _ shoppingList: ShoppingList,
-            with draft: CreateEditListView.ListDraft,
-            modelContext: ModelContext
-        ) -> Bool {
-            handlePersistenceOperation {
-                try makeStore(modelContext: modelContext).update(
-                    shoppingList,
-                    name: draft.name,
-                    color: draft.color,
-                    icon: draft.icon
-                )
-            }
         }
 
         func handleDuplicate(

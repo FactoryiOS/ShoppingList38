@@ -9,12 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct ShoppingListView: View {
-    enum ItemDestination: Hashable {
-        case create
-        case edit(ShoppingItem)
-    }
-
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppRouter.self) private var router
 
     @Query private var items: [ShoppingItem]
 
@@ -48,22 +44,16 @@ struct ShoppingListView: View {
         )
         .navigationTitle(shoppingList.name)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(item: $observed.itemDestination) { destination in
-            switch destination {
-            case .create:
-                CreateEditItemView(shoppingList: shoppingList)
-            case .edit(let item):
-                CreateEditItemView(
-                    shoppingList: shoppingList,
-                    item: item
-                )
-            }
-        }
         .safeAreaInset(edge: .bottom) {
             AppButton(
                 title: "Добавить товар",
                 isActive: true,
-                action: observed.handleAddItem
+                action: {
+                    observed.handleAddItem(
+                        to: shoppingList,
+                        router: router
+                    )
+                }
             )
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -112,7 +102,11 @@ struct ShoppingListView: View {
                     .tint(.deleteAction)
 
                     Button {
-                        observed.handleEditItem(item)
+                        observed.handleEditItem(
+                            item,
+                            in: shoppingList,
+                            router: router
+                        )
                     } label: {
                         Image(systemName: "square.and.pencil")
                     }
@@ -132,7 +126,7 @@ struct ShoppingListView: View {
         icon: .calendar
     )
 
-    NavigationStack {
+    AppNavigationStack {
         ShoppingListView(shoppingList: shoppingList)
     }
     .modelContainer(

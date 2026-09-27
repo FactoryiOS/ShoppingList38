@@ -10,6 +10,7 @@ import SwiftUI
 
 struct MyListsView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppRouter.self) private var router
 
     @Query(sort: \ShoppingList.createdAt, order: .reverse)
     private var shoppingLists: [ShoppingList]
@@ -36,21 +37,12 @@ struct MyListsView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             AppButton(title: "Создать список", isActive: true) {
-                observed.handleCreateButtonTapped()
+                observed.handleCreateButtonTapped(router: router)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 20)
         }
         .background(.appBackground)
-        .navigationDestination(isPresented: $observed.isCreatingList) {
-            createListView
-        }
-        .navigationDestination(for: ShoppingList.self) { shoppingList in
-            ShoppingListView(shoppingList: shoppingList)
-        }
-        .navigationDestination(item: $observed.listBeingEdited) { shoppingList in
-            editListView(shoppingList)
-        }
         .alert(
             "Удаление списка",
             isPresented: $observed.isShowingDeleteConfirmation,
@@ -101,7 +93,7 @@ struct MyListsView: View {
 
     private var listsView: some View {
         List(shoppingLists) { shoppingList in
-            NavigationLink(value: shoppingList) {
+            NavigationLink(value: AppDestination.shoppingList(shoppingList)) {
                 ListItemView(shoppingList: shoppingList)
             }
                 .buttonStyle(.plain)
@@ -125,7 +117,10 @@ struct MyListsView: View {
                     .tint(.copyAction)
 
                     Button {
-                        observed.handleEditButtonTapped(for: shoppingList)
+                        observed.handleEditButtonTapped(
+                            for: shoppingList,
+                            router: router
+                        )
                     } label: {
                         Image(systemName: "square.and.pencil")
                     }
@@ -147,39 +142,10 @@ struct MyListsView: View {
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0, for: .scrollContent)
     }
-
-    private var createListView: some View {
-        CreateEditListView(
-            mode: .create,
-            existingListNames: shoppingLists.map(\.name)
-        ) { draft in
-            observed.handleCreate(
-                draft,
-                modelContext: modelContext
-            )
-        }
-    }
-
-    private func editListView(_ shoppingList: ShoppingList) -> some View {
-        CreateEditListView(
-            mode: .edit(
-                name: shoppingList.name,
-                color: shoppingList.color,
-                icon: shoppingList.icon
-            ),
-            existingListNames: shoppingLists.map(\.name)
-        ) { draft in
-            observed.handleUpdate(
-                shoppingList,
-                with: draft,
-                modelContext: modelContext
-            )
-        }
-    }
 }
 
 #Preview("My lists (empty)") {
-    NavigationStack {
+    AppNavigationStack {
         MyListsView()
     }
     .modelContainer(
@@ -189,7 +155,7 @@ struct MyListsView: View {
 }
 
 #Preview("My lists (data)") {
-    NavigationStack {
+    AppNavigationStack {
         MyListsView()
     }
     .modelContainer(makeMyListsPreviewContainer())

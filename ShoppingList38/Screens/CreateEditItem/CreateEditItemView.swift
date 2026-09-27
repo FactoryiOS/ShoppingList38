@@ -109,7 +109,7 @@ struct CreateEditItemView: View {
         icon: .calendar
     )
 
-    NavigationStack {
+    AppNavigationStack {
         CreateEditItemView(shoppingList: shoppingList)
     }
     .modelContainer(
@@ -125,7 +125,7 @@ struct CreateEditItemView: View {
         icon: .calendar
     )
 
-    NavigationStack {
+    AppNavigationStack {
         CreateEditItemView(
             shoppingList: shoppingList,
             item: .mock
