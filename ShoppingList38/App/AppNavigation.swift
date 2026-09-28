@@ -9,21 +9,50 @@ import Observation
 import SwiftData
 import SwiftUI
 
-enum AppDestination: Hashable {
+enum AppDestination: Hashable, Identifiable {
     case createList
     case editList(id: UUID)
     case shoppingList(id: UUID)
     case createItem(shoppingListID: UUID)
     case editItem(shoppingListID: UUID, itemID: UUID)
+
+    var id: Self { self }
 }
 
 @MainActor
 @Observable
 final class AppRouter {
-    var path: [AppDestination] = []
+    fileprivate(set) var path: [AppDestination] = []
+    fileprivate(set) var presentedModal: AppDestination?
 
-    func navigate(to destination: AppDestination) {
+    func push(_ destination: AppDestination) {
         path.append(destination)
+    }
+
+    func pop() {
+        guard !path.isEmpty else { return }
+        path.removeLast()
+    }
+
+    func popToRoot() {
+        path.removeAll()
+    }
+
+    func showModal(_ destination: AppDestination) {
+        presentedModal = destination
+    }
+
+    func dismissModal() {
+        presentedModal = nil
+    }
+
+    /// Closes the current presentation regardless of whether it was pushed or shown modally.
+    func dismiss() {
+        if presentedModal != nil {
+            dismissModal()
+        } else {
+            pop()
+        }
     }
 }
 
@@ -44,6 +73,12 @@ struct AppNavigationStack<Content: View>: View {
                 .navigationDestination(for: AppDestination.self) { destination in
                     AppDestinationView(destination: destination)
                 }
+        }
+        .sheet(item: $router.presentedModal) { destination in
+            NavigationStack {
+                AppDestinationView(destination: destination)
+            }
+            .environment(router)
         }
         .environment(router)
     }
@@ -135,7 +170,7 @@ private struct MissingDestinationView: View {
             Text("Возможно, он был удалён.")
         } actions: {
             Button("Мои списки") {
-                router.path.removeAll()
+                router.popToRoot()
             }
         }
     }

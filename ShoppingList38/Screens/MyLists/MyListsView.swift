@@ -93,11 +93,12 @@ struct MyListsView: View {
 
     private var listsView: some View {
         List(shoppingLists) { shoppingList in
-            NavigationLink(value: AppDestination.shoppingList(id: shoppingList.id)) {
+            Button {
+                router.push(.shoppingList(id: shoppingList.id))
+            } label: {
                 ListItemView(shoppingList: shoppingList)
             }
                 .buttonStyle(.plain)
-                .navigationLinkIndicatorVisibility(.hidden)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
                         observed.handleDeleteButtonTapped(for: shoppingList)

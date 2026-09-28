@@ -39,14 +39,14 @@ extension MyListsView {
         }
 
         func handleCreateButtonTapped(router: AppRouter) {
-            router.navigate(to: .createList)
+            router.push(.createList)
         }
 
         func handleEditButtonTapped(
             for shoppingList: ShoppingList,
             router: AppRouter
         ) {
-            router.navigate(to: .editList(id: shoppingList.id))
+            router.push(.editList(id: shoppingList.id))
         }
 
         func handleDeleteButtonTapped(for shoppingList: ShoppingList) {

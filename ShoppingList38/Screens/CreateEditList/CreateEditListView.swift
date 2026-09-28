@@ -31,8 +31,7 @@ struct CreateEditListView: View {
         let icon: ListIcon
     }
 
-    /// Системное действие закрытия текущего экрана.
-    @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
     @Environment(\.modelContext) private var modelContext
 
     @Query(sort: \ShoppingList.createdAt, order: .reverse)
@@ -123,7 +122,7 @@ struct CreateEditListView: View {
 
     private var navigationHeader: some View {
         HStack(spacing: 0) {
-            Button(action: dismiss.callAsFunction) {
+            Button(action: router.dismiss) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.primary)
@@ -151,7 +150,7 @@ struct CreateEditListView: View {
             return
         }
 
-        dismiss()
+        router.dismiss()
     }
 }
 

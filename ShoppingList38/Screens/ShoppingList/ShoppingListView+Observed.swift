@@ -60,8 +60,8 @@ extension ShoppingListView {
             in shoppingList: ShoppingList,
             router: AppRouter
         ) {
-            router.navigate(
-                to: .editItem(
+            router.push(
+                .editItem(
                     shoppingListID: shoppingList.id,
                     itemID: item.id
                 )
@@ -72,8 +72,8 @@ extension ShoppingListView {
             to shoppingList: ShoppingList,
             router: AppRouter
         ) {
-            router.navigate(
-                to: .createItem(shoppingListID: shoppingList.id)
+            router.push(
+                .createItem(shoppingListID: shoppingList.id)
             )
         }
 

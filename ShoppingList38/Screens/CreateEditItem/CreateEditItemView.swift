@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct CreateEditItemView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
     @Environment(\.modelContext) private var modelContext
 
     @State private var observed: Observed
@@ -68,7 +68,7 @@ struct CreateEditItemView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Отменить", action: dismiss.callAsFunction)
+                Button("Отменить", action: router.dismiss)
             }
 
             ToolbarItem(placement: .confirmationAction) {
@@ -98,7 +98,7 @@ struct CreateEditItemView: View {
             return
         }
 
-        dismiss()
+        router.dismiss()
     }
 }
 
