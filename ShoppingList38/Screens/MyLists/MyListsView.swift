@@ -93,7 +93,7 @@ struct MyListsView: View {
 
     private var listsView: some View {
         List(shoppingLists) { shoppingList in
-            NavigationLink(value: AppDestination.shoppingList(shoppingList)) {
+            NavigationLink(value: AppDestination.shoppingList(id: shoppingList.id)) {
                 ListItemView(shoppingList: shoppingList)
             }
                 .buttonStyle(.plain)

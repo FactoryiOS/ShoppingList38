@@ -46,7 +46,7 @@ extension MyListsView {
             for shoppingList: ShoppingList,
             router: AppRouter
         ) {
-            router.navigate(to: .editList(shoppingList))
+            router.navigate(to: .editList(id: shoppingList.id))
         }
 
         func handleDeleteButtonTapped(for shoppingList: ShoppingList) {
