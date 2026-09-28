@@ -84,4 +84,8 @@ final class ShoppingList {
         iconRawValue = icon.rawValue
         self.updatedAt = updatedAt
     }
+
+    func touch(updatedAt: Date = .now) {
+        self.updatedAt = updatedAt
+    }
 }

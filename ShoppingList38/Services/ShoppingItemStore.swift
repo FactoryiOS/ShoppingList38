@@ -24,14 +24,18 @@ struct ShoppingItemStore {
         quantity: Double,
         unit: String
     ) throws -> ShoppingItem {
+        let now = Date.now
         let item = ShoppingItem(
             title: title,
             quantity: quantity,
             unit: unit,
+            createdAt: now,
+            updatedAt: now,
             shoppingList: shoppingList
         )
 
         modelContext.insert(item)
+        shoppingList.touch(updatedAt: now)
         try saveChanges()
 
         return item
@@ -43,21 +47,28 @@ struct ShoppingItemStore {
         quantity: Double,
         unit: String
     ) throws {
+        let now = Date.now
         item.update(
             title: title,
             quantity: quantity,
-            unit: unit
+            unit: unit,
+            updatedAt: now
         )
+        item.shoppingList?.touch(updatedAt: now)
         try saveChanges()
     }
 
     func togglePurchased(_ item: ShoppingItem) throws {
-        item.togglePurchased()
+        let now = Date.now
+        item.togglePurchased(updatedAt: now)
+        item.shoppingList?.touch(updatedAt: now)
         try saveChanges()
     }
 
     func delete(_ item: ShoppingItem) throws {
+        let shoppingList = item.shoppingList
         modelContext.delete(item)
+        shoppingList?.touch()
         try saveChanges()
     }
 
