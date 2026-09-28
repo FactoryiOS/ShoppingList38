@@ -12,7 +12,7 @@ struct ListItemView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(shoppingList.icon.rawValue)
+            Image(shoppingList.icon.assetName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 21, height: 21)

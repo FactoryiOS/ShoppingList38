@@ -6,11 +6,17 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
 
 /// Список покупок, сохраняемый в SwiftData.
 @Model
 final class ShoppingList {
+    private static let logger = Logger(
+        subsystem: "com-tsomuk.ShoppingList38",
+        category: "ShoppingListPersistence"
+    )
+
     @Attribute(.unique) var id: UUID
 
     private(set) var name: String
@@ -24,11 +30,21 @@ final class ShoppingList {
     private(set) var items: [ShoppingItem] = []
 
     var color: ListColor {
-        ListColor(rawValue: colorRawValue) ?? .blue
+        guard let color = ListColor(rawValue: colorRawValue) else {
+            Self.logger.error("Неизвестный сохранённый цвет: \(self.colorRawValue, privacy: .public)")
+            return .blue
+        }
+
+        return color
     }
 
     var icon: ListIcon {
-        ListIcon(rawValue: iconRawValue) ?? .cart
+        guard let icon = ListIcon(rawValue: iconRawValue) else {
+            Self.logger.error("Неизвестная сохранённая иконка: \(self.iconRawValue, privacy: .public)")
+            return .cart
+        }
+
+        return icon
     }
 
     var purchasedItemsCount: Int {
