@@ -78,6 +78,7 @@ struct AppNavigationStack<Content: View>: View {
             NavigationStack {
                 AppDestinationView(destination: destination)
             }
+            .presentationDragIndicator(.visible)
             .environment(router)
         }
         .environment(router)

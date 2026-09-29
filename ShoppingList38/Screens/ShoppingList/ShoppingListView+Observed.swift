@@ -60,7 +60,7 @@ extension ShoppingListView {
             in shoppingList: ShoppingList,
             router: AppRouter
         ) {
-            router.push(
+            router.showModal(
                 .editItem(
                     shoppingListID: shoppingList.id,
                     itemID: item.id
@@ -72,7 +72,7 @@ extension ShoppingListView {
             to shoppingList: ShoppingList,
             router: AppRouter
         ) {
-            router.push(
+            router.showModal(
                 .createItem(shoppingListID: shoppingList.id)
             )
         }
