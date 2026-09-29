@@ -30,8 +30,8 @@ struct CreateEditListView: View {
         let icon: ListIcon
     }
 
-    /// Системное действие закрытия текущего экрана.
-    @Environment(\.dismiss) private var dismiss
+    /// Роутер для возврата с экрана.
+    @Environment(AppRouter.self) private var router
 
     /// Наблюдаемое состояние и логика формы.
     @State private var observed: Observed
@@ -102,7 +102,7 @@ struct CreateEditListView: View {
 
     private var navigationHeader: some View {
         HStack(spacing: 0) {
-            Button(action: dismiss.callAsFunction) {
+            Button(action: router.pop) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.primary)
@@ -130,12 +130,12 @@ struct CreateEditListView: View {
             return
         }
 
-        dismiss()
+        router.popToRoot()
     }
 }
 
 #Preview("Создание (Light mode)") {
-    NavigationStack {
+    AppNavigationStack {
         CreateEditListView(
             mode: .create,
             existingListNames: ["Новый год"],
@@ -146,7 +146,7 @@ struct CreateEditListView: View {
 }
 
 #Preview("Создание (Dark mode)") {
-    NavigationStack {
+    AppNavigationStack {
         CreateEditListView(
             mode: .create,
             existingListNames: ["Новый год"],
@@ -157,7 +157,7 @@ struct CreateEditListView: View {
 }
 
 #Preview("Редактирование (Light mode)") {
-    NavigationStack {
+    AppNavigationStack {
         CreateEditListView(
             mode: .edit(
                 name: "Новый год",
@@ -171,7 +171,7 @@ struct CreateEditListView: View {
 }
 
 #Preview("Редактирование (Dark Mode)") {
-    NavigationStack {
+    AppNavigationStack {
         CreateEditListView(
             mode: .edit(
                 name: "Новый год",

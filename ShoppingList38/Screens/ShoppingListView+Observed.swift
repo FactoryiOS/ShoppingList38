@@ -37,8 +37,8 @@ extension ShoppingListView {
             print("Edit item: \(item.title)")
         }
 
-        func handleAddItem() {
-            print("Add item tapped")
+        func handleAddItem(router: AppRouter) {
+            router.showModal(.createItem)
         }
 
         func handleMoreTapped() {
