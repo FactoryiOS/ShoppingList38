@@ -9,6 +9,8 @@ import SwiftUI
 
 struct MyListsView: View {
     
+    @Environment(AppRouter.self) private var router
+    
     let items: [ListItem]
     
     var body: some View {
@@ -41,7 +43,12 @@ struct MyListsView: View {
                 
             } else {
                 List(items) { item in
-                    ListItemView(item: item)
+                    Button {
+                        router.push(.shoppingList(item))
+                    } label: {
+                        ListItemView(item: item)
+                    }
+                        .buttonStyle(.plain)
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button {
                                 print("Удалить \(item.title)")
@@ -77,7 +84,7 @@ struct MyListsView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             AppButton(title: "Создать список", isActive: true) {
-                print("Создать список")
+                router.push(.createList)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 20)
@@ -87,9 +94,13 @@ struct MyListsView: View {
 }
 
 #Preview("Empty") {
-    MyListsView(items: [])
+    AppNavigationStack {
+        MyListsView(items: [])
+    }
 }
 
 #Preview("Data") {
-    MyListsView(items: ListItem.mocks)
+    AppNavigationStack {
+        MyListsView(items: ListItem.mocks)
+    }
 }

@@ -8,7 +8,15 @@
 import SwiftUI
 
 struct ShoppingListView: View {
-    @State private var observed = Observed()
+    @Environment(AppRouter.self) private var router
+
+    @State private var observed: Observed
+
+    init(listTitle: String = "Новый год") {
+        _observed = State(
+            initialValue: Observed(listTitle: listTitle)
+        )
+    }
 
     var body: some View {
         @Bindable var observed = observed
@@ -45,15 +53,15 @@ struct ShoppingListView: View {
             prompt: "Поиск"
         )
         .safeAreaInset(edge: .bottom) {
-            AppButton(
-                title: "Добавить товар",
-                isActive: true,
-                action: observed.handleAddItem
-            )
+            AppButton(title: "Добавить товар", isActive: true) {
+                observed.handleAddItem(router: router)
+            }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(Color("SurfaceBackground"))
         }
+        .navigationTitle(observed.listTitle)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: observed.handleMoreTapped) {
@@ -65,7 +73,7 @@ struct ShoppingListView: View {
 }
 
 #Preview {
-    NavigationStack {
+    AppNavigationStack {
         ShoppingListView()
     }
 }
