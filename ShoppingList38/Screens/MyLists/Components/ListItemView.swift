@@ -8,28 +8,28 @@
 import SwiftUI
 
 struct ListItemView: View {
-    let item: ListItem
+    let shoppingList: ShoppingList
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(item.icon.rawValue)
+            Image(shoppingList.icon.assetName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 21, height: 21)
                 .frame(width: 48, height: 48)
-                .background(item.iconColor)
+                .background(shoppingList.color.color)
                 .clipShape(Circle())
                 .foregroundStyle(.iconForeground)
 
-            Text(item.title)
+            Text(shoppingList.name)
                 .font(AppTypography.title3Semibold)
 
             Spacer()
 
             HStack(spacing: 0) {
-                Text("\(item.currentCount)/")
+                Text("\(shoppingList.purchasedItemsCount)/")
                     .font(AppTypography.body)
-                Text("\(item.totalCount)")
+                Text("\(shoppingList.totalItemsCount)")
                     .font(AppTypography.headline)
             }
         }
@@ -44,7 +44,13 @@ struct ListItemView: View {
 #Preview("Light") {
     ZStack {
         Color("AppBackground").ignoresSafeArea()
-        ListItemView(item: ListItem.mock)
+        ListItemView(
+            shoppingList: ShoppingList(
+                name: "Новый год",
+                color: .blue,
+                icon: .calendar
+            )
+        )
             .padding()
     }
     .preferredColorScheme(.light)
@@ -53,7 +59,13 @@ struct ListItemView: View {
 #Preview("Dark") {
     ZStack {
         Color("AppBackground").ignoresSafeArea()
-        ListItemView(item: ListItem.mock)
+        ListItemView(
+            shoppingList: ShoppingList(
+                name: "Новый год",
+                color: .blue,
+                icon: .calendar
+            )
+        )
             .padding()
     }
     .preferredColorScheme(.dark)

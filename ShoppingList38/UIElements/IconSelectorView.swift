@@ -47,7 +47,7 @@ struct IconSelectorView: View {
                 Circle()
                     .fill(backgroundColor(for: icon))
 
-                Image(icon.rawValue)
+                Image(icon.assetName)
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()

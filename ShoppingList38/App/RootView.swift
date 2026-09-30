@@ -18,7 +18,7 @@ struct RootView: View {
             }
         case .content:
             AppNavigationStack {
-                MyListsView(items: ListItem.mocks)
+                MyListsView()
             }
         }
     }

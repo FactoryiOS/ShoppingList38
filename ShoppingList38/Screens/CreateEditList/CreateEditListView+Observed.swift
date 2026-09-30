@@ -6,6 +6,7 @@
 //
 
 import Observation
+import SwiftData
 import SwiftUI
 
 extension CreateEditListView {
@@ -32,8 +33,8 @@ extension CreateEditListView {
         /// Текст ошибки названия, отображаемый под полем ввода.
         private(set) var nameErrorMessage: String?
 
-        /// Нормализованные названия существующих списков для проверки дубликатов.
-        private let existingListNames: Set<String>
+        /// Текст ошибки сохранения списка.
+        private(set) var persistenceErrorMessage: String?
 
         /// Исходное название редактируемого списка; позволяет сохранить его без смены имени.
         private let originalListName: String?
@@ -70,14 +71,19 @@ extension CreateEditListView {
             selectedIcon != nil
         }
 
-        init(
-            mode: Mode,
-            existingListNames: [String]
-        ) {
+        var isShowingPersistenceError: Bool {
+            get {
+                persistenceErrorMessage != nil
+            }
+            set {
+                if !newValue {
+                    persistenceErrorMessage = nil
+                }
+            }
+        }
+
+        init(mode: Mode) {
             self.mode = mode
-            self.existingListNames = Set(
-                existingListNames.map(Self.normalize)
-            )
 
             switch mode {
             case .create:
@@ -93,7 +99,52 @@ extension CreateEditListView {
             }
         }
 
-        func handleSave() -> ListDraft? {
+        func handleSave(
+            shoppingList: ShoppingList?,
+            existingListNames: [String],
+            modelContext: ModelContext
+        ) -> Bool {
+            guard let draft = makeDraft(
+                existingListNames: existingListNames
+            ) else {
+                return false
+            }
+
+            do {
+                let store = ShoppingListStore(modelContext: modelContext)
+
+                if let shoppingList {
+                    try store.update(
+                        shoppingList,
+                        name: draft.name,
+                        color: draft.color,
+                        icon: draft.icon
+                    )
+                } else {
+                    _ = try store.create(
+                        name: draft.name,
+                        color: draft.color,
+                        icon: draft.icon
+                    )
+                }
+
+                return true
+            } catch ShoppingListStoreError.duplicateName {
+                nameErrorMessage = ShoppingListStoreError.duplicateName.localizedDescription
+                return false
+            } catch {
+                persistenceErrorMessage = error.localizedDescription
+                return false
+            }
+        }
+
+        func handlePersistenceErrorDismissal() {
+            persistenceErrorMessage = nil
+        }
+
+        private func makeDraft(
+            existingListNames: [String]
+        ) -> ListDraft? {
             guard isFormComplete,
                   let selectedColor,
                   let selectedIcon
@@ -101,8 +152,8 @@ extension CreateEditListView {
                 return nil
             }
 
-            guard !isDuplicateName else {
-                nameErrorMessage = "Это название уже используется, пожалуйста, измените его."
+            guard !isDuplicateName(in: existingListNames) else {
+                nameErrorMessage = ShoppingListStoreError.duplicateName.localizedDescription
                 return nil
             }
 
@@ -119,24 +170,19 @@ extension CreateEditListView {
         }
 
         /// Признак совпадения введённого названия с другим списком.
-        private var isDuplicateName: Bool {
-            let normalizedName = Self.normalize(trimmedListName)
+        private func isDuplicateName(
+            in existingListNames: [String]
+        ) -> Bool {
+            let normalizedName = ShoppingListName.normalize(trimmedListName)
 
             if let originalListName,
-               normalizedName == Self.normalize(originalListName) {
+               normalizedName == ShoppingListName.normalize(originalListName) {
                 return false
             }
 
-            return existingListNames.contains(normalizedName)
-        }
-
-        private static func normalize(_ name: String) -> String {
-            name
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .folding(
-                    options: [.caseInsensitive, .diacriticInsensitive],
-                    locale: .current
-                )
+            return existingListNames
+                .map(ShoppingListName.normalize)
+                .contains(normalizedName)
         }
     }
 }
