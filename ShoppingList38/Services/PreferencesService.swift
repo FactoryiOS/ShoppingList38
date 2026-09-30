@@ -9,11 +9,13 @@ import Foundation
 
 protocol PreferencesStoring: AnyObject {
     var hasCompletedWelcome: Bool { get set }
+    var appTheme: AppColorScheme { get set }
 }
 
 final class PreferencesService: PreferencesStoring {
     private enum Keys {
         static let hasCompletedWelcomeKey = "appState.hasCompletedWelcome"
+        static let appThemeKey = "appState.themePreference"
     }
 
     private let storage: UserDefaults
@@ -28,6 +30,19 @@ final class PreferencesService: PreferencesStoring {
         }
         set {
             storage.set(newValue, forKey: Keys.hasCompletedWelcomeKey)
+        }
+    }
+    
+    var appTheme: AppColorScheme {
+        get {
+            guard let rawValue = storage.string(forKey: Keys.appThemeKey),
+                  let scheme = AppColorScheme(rawValue: rawValue) else {
+                return .system 
+            }
+            return scheme
+        }
+        set {
+            storage.set(newValue.rawValue, forKey: Keys.appThemeKey)
         }
     }
 }

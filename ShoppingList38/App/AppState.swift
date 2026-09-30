@@ -19,9 +19,16 @@ final class AppState {
 
     private(set) var route: AppRoute
 
-    init(preferences: any PreferencesStoring) {
+    var currentTheme: AppColorScheme {
+        didSet {
+            preferences.appTheme = currentTheme
+        }
+    }
+
+    init(preferences: any PreferencesStoring = PreferencesService()) {
         self.preferences = preferences
         route = preferences.hasCompletedWelcome ? .content : .welcome
+        currentTheme = preferences.appTheme
     }
 
     func handleWelcomeCompletion() {

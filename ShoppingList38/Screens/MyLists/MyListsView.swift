@@ -11,6 +11,7 @@ import SwiftUI
 struct MyListsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
+    @Environment(AppState.self) private var appState
 
     @Query(sort: \ShoppingList.createdAt, order: .reverse)
     private var shoppingLists: [ShoppingList]
@@ -80,10 +81,36 @@ struct MyListsView: View {
 
             Spacer()
 
-            Button {
+            Menu {
+                Picker(
+                    "Установить тему",
+                    systemImage: "circle.lefthalf.filled.inverse",
+                    selection: Binding(
+                        get: { appState.currentTheme },
+                        set: { appState.currentTheme = $0 }
+                    )
+                ) {
+                    ForEach(AppColorScheme.allCases) { scheme in
+                        Text(scheme.displayName)
+                            .tag(scheme)
+                    }
+                }
+                .pickerStyle(.menu)
+
+                Divider()
+
+                Button {
+                } label: {
+                    Label(
+                        "Сортировать по алфавиту",
+                        systemImage: "arrow.up.arrow.down"
+                    )
+                }
             } label: {
                 Image(systemName: "ellipsis.circle")
+                    .font(.system(size: 24))
                     .foregroundStyle(.primaryText)
+                    .frame(width: 44, height: 44)
             }
         }
         .padding(.horizontal, 16)
@@ -146,9 +173,13 @@ struct MyListsView: View {
 }
 
 #Preview("My lists (empty)") {
+    let appState = AppState()
+
     AppNavigationStack {
         MyListsView()
     }
+    .environment(appState)
+    .preferredColorScheme(appState.currentTheme.colorScheme)
     .modelContainer(
         for: [ShoppingList.self, ShoppingItem.self],
         inMemory: true
@@ -156,9 +187,13 @@ struct MyListsView: View {
 }
 
 #Preview("My lists (data)") {
+    let appState = AppState()
+
     AppNavigationStack {
         MyListsView()
     }
+    .environment(appState)
+    .preferredColorScheme(appState.currentTheme.colorScheme)
     .modelContainer(makeMyListsPreviewContainer())
 }
 

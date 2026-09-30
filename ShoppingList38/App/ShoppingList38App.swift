@@ -22,6 +22,8 @@ struct ShoppingList38App: App {
     var body: some Scene {
         WindowGroup {
             RootView(appState: appState)
+                .environment(appState)
+                .preferredColorScheme(appState.currentTheme.colorScheme)
         }
         .modelContainer(for: [ShoppingList.self, ShoppingItem.self])
     }
