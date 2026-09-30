@@ -33,8 +33,18 @@ struct ShoppingListView: View {
     var body: some View {
         @Bindable var observed = observed
 
-        VStack(spacing: 0) {
-            itemsList
+        Group {
+            if items.isEmpty {
+                EmptyStateView(
+                    imageName: "EmptyProductsImage",
+                    title: "Давайте спланируем покупки!",
+                    subtitle: "Начните добавлять товары",
+                    imageSize: 343
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                itemsList
+            }
         }
         .background(Color("SurfaceBackground"))
         .searchable(
@@ -44,6 +54,7 @@ struct ShoppingListView: View {
         )
         .navigationTitle(shoppingList.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarRole(.editor)
         .safeAreaInset(edge: .bottom) {
             AppButton(
                 title: "Добавить товар",
@@ -59,12 +70,23 @@ struct ShoppingListView: View {
             .padding(.vertical, 12)
             .background(Color("SurfaceBackground"))
         }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: observed.handleMoreTapped) {
-                    Image(systemName: "ellipsis.circle")
-                }
+        .alert(
+            "Удаление товара",
+            isPresented: $observed.isShowingDeleteConfirmation,
+            presenting: observed.itemPendingDeletion
+        ) { item in
+            Button("Отменить", role: .cancel) {
+                observed.handleDeleteCancellation()
             }
+
+            Button("Удалить", role: .destructive) {
+                observed.handleDeleteConfirmation(
+                    item,
+                    modelContext: modelContext
+                )
+            }
+        } message: { _ in
+            Text("Вы действительно хотите удалить товар?")
         }
         .alert(
             "Не удалось изменить товар",
@@ -81,21 +103,37 @@ struct ShoppingListView: View {
     private var itemsList: some View {
         List {
             ForEach(observed.filteredItems(items)) { item in
+                let isPendingDeletion = observed.itemPendingDeletion?.id == item.id
+
                 ShoppingItemView(item: item) {
                     observed.handleTogglePurchased(
                         item,
                         modelContext: modelContext
                     )
                 }
+                .background(Color("SurfaceBackground"))
+                .offset(x: isPendingDeletion ? -80 : 0)
+                .background(alignment: .trailing) {
+                    ZStack {
+                        Color.deleteAction
+
+                        Image(systemName: "trash")
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundStyle(.white)
+                    }
+                    .frame(width: 80)
+                    .opacity(isPendingDeletion ? 1 : 0)
+                }
+                .animation(
+                    .easeInOut(duration: 0.25),
+                    value: isPendingDeletion
+                )
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color("SurfaceBackground"))
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
-                        observed.handleDelete(
-                            item,
-                            modelContext: modelContext
-                        )
+                        observed.handleDeleteButtonTapped(for: item)
                     } label: {
                         Image(systemName: "trash")
                     }
