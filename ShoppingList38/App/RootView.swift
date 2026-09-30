@@ -42,6 +42,7 @@ struct RootView: View {
 
 private final class PreviewPreferences: PreferencesStoring {
     var hasCompletedWelcome: Bool
+    var appTheme: AppColorScheme = .system
 
     init(hasCompletedWelcome: Bool) {
         self.hasCompletedWelcome = hasCompletedWelcome
