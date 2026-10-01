@@ -13,6 +13,7 @@ extension MyListsView {
     @MainActor
     @Observable
     final class Observed {
+        var isSortedAlphabetically = false
         private(set) var listPendingDeletion: ShoppingList?
         private(set) var persistenceErrorMessage: String?
 
@@ -36,6 +37,20 @@ extension MyListsView {
                     persistenceErrorMessage = nil
                 }
             }
+        }
+
+        func sortedLists(_ shoppingLists: [ShoppingList]) -> [ShoppingList] {
+            guard isSortedAlphabetically else {
+                return shoppingLists
+            }
+
+            return shoppingLists.sorted {
+                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
+        }
+
+        func handleAlphabeticalSortTapped() {
+            isSortedAlphabetically.toggle()
         }
 
         func handleCreateButtonTapped(router: AppRouter) {

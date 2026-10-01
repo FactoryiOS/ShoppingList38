@@ -18,6 +18,10 @@ struct MyListsView: View {
 
     @State private var observed = Observed()
 
+    private var displayedShoppingLists: [ShoppingList] {
+        observed.sortedLists(shoppingLists)
+    }
+
     var body: some View {
         @Bindable var observed = observed
 
@@ -100,10 +104,13 @@ struct MyListsView: View {
                 Divider()
 
                 Button {
+                    observed.handleAlphabeticalSortTapped()
                 } label: {
                     Label(
                         "Сортировать по алфавиту",
-                        systemImage: "arrow.up.arrow.down"
+                        systemImage: observed.isSortedAlphabetically
+                            ? "checkmark"
+                            : "arrow.up.arrow.down"
                     )
                 }
             } label: {
@@ -119,7 +126,7 @@ struct MyListsView: View {
     }
 
     private var listsView: some View {
-        List(shoppingLists) { shoppingList in
+        List(displayedShoppingLists) { shoppingList in
             Button {
                 router.push(.shoppingList(id: shoppingList.id))
             } label: {

@@ -13,10 +13,16 @@ extension CreateEditItemView {
     @MainActor
     @Observable
     final class Observed {
-        let unit = "шт."
-
         var itemName: String
-        var quantityText: String
+        var quantityText: String {
+            didSet {
+                let filtered = Self.filteredQuantityText(quantityText)
+                if filtered != quantityText {
+                    quantityText = filtered
+                }
+            }
+        }
+        var unit: MeasurementUnit
         private(set) var persistenceErrorMessage: String?
 
         private let isEditing: Bool
@@ -43,7 +49,8 @@ extension CreateEditItemView {
         init(item: ShoppingItem?) {
             isEditing = item != nil
             itemName = item?.title ?? ""
-            quantityText = item.map(Self.quantityText) ?? "1"
+            quantityText = item.map(Self.quantityText) ?? ""
+            unit = item.map { MeasurementUnit.from(storedValue: $0.unit) } ?? .pieces
         }
 
         func handleSave(
@@ -104,7 +111,7 @@ extension CreateEditItemView {
             return ItemDraft(
                 title: title,
                 quantity: quantity,
-                unit: unit
+                unit: unit.title
             )
         }
 
@@ -117,6 +124,24 @@ extension CreateEditItemView {
                 of: ".",
                 with: Locale.current.decimalSeparator ?? "."
             )
+        }
+
+        private static func filteredQuantityText(_ text: String) -> String {
+            let decimalSeparator = Locale.current.decimalSeparator ?? "."
+            var result = ""
+            var hasSeparator = false
+
+            for character in text {
+                if character.isNumber {
+                    result.append(character)
+                } else if character == "." || character == "," {
+                    guard !hasSeparator else { continue }
+                    hasSeparator = true
+                    result.append(contentsOf: decimalSeparator)
+                }
+            }
+
+            return result
         }
     }
 

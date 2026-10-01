@@ -8,13 +8,28 @@
 import Foundation
 import Observation
 import SwiftData
+import SwiftUI
 
 extension ShoppingListView {
     @MainActor
     @Observable
     final class Observed {
         var searchText = ""
+        private(set) var itemPendingDeletion: ShoppingItem?
         private(set) var persistenceErrorMessage: String?
+
+        var isShowingDeleteConfirmation: Bool {
+            get {
+                itemPendingDeletion != nil
+            }
+            set {
+                if !newValue {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        itemPendingDeletion = nil
+                    }
+                }
+            }
+        }
 
         var isShowingPersistenceError: Bool {
             get {
@@ -37,12 +52,27 @@ extension ShoppingListView {
             }
         }
 
-        func handleDelete(
+        func handleDeleteButtonTapped(for item: ShoppingItem) {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                itemPendingDeletion = item
+            }
+        }
+
+        func handleDeleteCancellation() {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                itemPendingDeletion = nil
+            }
+        }
+
+        func handleDeleteConfirmation(
             _ item: ShoppingItem,
             modelContext: ModelContext
         ) {
-            handlePersistenceOperation {
-                try makeStore(modelContext: modelContext).delete(item)
+            withAnimation(.easeInOut(duration: 0.25)) {
+                itemPendingDeletion = nil
+                handlePersistenceOperation {
+                    try makeStore(modelContext: modelContext).delete(item)
+                }
             }
         }
 
@@ -75,9 +105,6 @@ extension ShoppingListView {
             router.showModal(
                 .createItem(shoppingListID: shoppingList.id)
             )
-        }
-
-        func handleMoreTapped() {
         }
 
         func handlePersistenceErrorDismissal() {

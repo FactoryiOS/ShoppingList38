@@ -65,7 +65,7 @@ extension ShoppingItem {
         ShoppingItem(
             title: "текст",
             quantity: 2,
-            unit: "шт.",
+            unit: "шт",
             isPurchased: false
         )
     }
@@ -74,7 +74,7 @@ extension ShoppingItem {
         ShoppingItem(
             title: "Чайник",
             quantity: 2,
-            unit: "шт.",
+            unit: "шт",
             isPurchased: true
         )
     }
@@ -85,10 +85,10 @@ extension ShoppingItem {
 
     static var mocks: [ShoppingItem] {
         [
-            ShoppingItem(title: "текст", quantity: 2, unit: "шт.", isPurchased: false),
-            ShoppingItem(title: "текст", quantity: 2, unit: "шт.", isPurchased: false),
-            ShoppingItem(title: "Чайник", quantity: 2, unit: "шт.", isPurchased: true),
-            ShoppingItem(title: "текст", quantity: 2, unit: "шт.", isPurchased: false)
+            ShoppingItem(title: "текст", quantity: 2, unit: "шт", isPurchased: false),
+            ShoppingItem(title: "текст", quantity: 2, unit: "шт", isPurchased: false),
+            ShoppingItem(title: "Чайник", quantity: 2, unit: "шт", isPurchased: true),
+            ShoppingItem(title: "текст", quantity: 2, unit: "шт", isPurchased: false)
         ]
     }
 }
